@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        display: ['Oswald', 'sans-serif'],
+        body: ['Roboto Condensed', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -46,6 +50,16 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        arena: {
+          neon: "hsl(var(--arena-neon))",
+          "neon-glow": "hsl(var(--arena-neon-glow))",
+          dark: "hsl(var(--arena-dark))",
+          surface: "hsl(var(--arena-surface))",
+          "surface-light": "hsl(var(--arena-surface-light))",
+          gold: "hsl(var(--arena-gold))",
+          red: "hsl(var(--arena-red))",
+          blue: "hsl(var(--arena-blue))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
