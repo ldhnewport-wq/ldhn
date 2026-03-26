@@ -12,11 +12,11 @@ const ArenaHeader = () => (
         <span className="font-display text-primary-foreground text-xl font-bold">L</span>
       </div>
       <div>
-        <h1 className="font-display text-3xl font-bold tracking-wider text-neon">
+      <h1 className="font-display text-3xl font-bold tracking-wider text-neon">
           LDHN
         </h1>
         <p className="text-xs text-muted-foreground tracking-[0.3em] uppercase">
-          Ligue de Hockey du Nord
+          Ligue de Dek Hockey Newport
         </p>
       </div>
     </motion.div>
