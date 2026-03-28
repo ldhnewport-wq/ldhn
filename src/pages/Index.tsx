@@ -1,6 +1,14 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import ldhnLogo from "@/assets/ldhn-logo-full.jpg";
+import { Users, Swords, Trophy, Monitor } from "lucide-react";
+
+const navItems = [
+  { to: "/equipes", icon: Users, label: "Équipes", desc: "Gérer les équipes et alignements" },
+  { to: "/matchs", icon: Swords, label: "Matchs", desc: "Créer et scorer les matchs" },
+  { to: "/classement", icon: Trophy, label: "Classement", desc: "Voir le classement en temps réel" },
+  { to: "/arena", icon: Monitor, label: "Mode Aréna", desc: "Affichage plein écran pour projection" },
+];
 
 const Index = () => {
   return (
@@ -12,21 +20,31 @@ const Index = () => {
         transition={{ duration: 0.7 }}
       >
         <img src={ldhnLogo} alt="LDHN" className="w-40 h-40 object-contain mx-auto mb-8" />
-        <h1 className="font-display text-6xl md:text-8xl font-bold tracking-wider text-neon mb-4">
+        <h1 className="font-display text-5xl md:text-7xl font-bold tracking-wider text-neon mb-2">
           LDHN
         </h1>
-        <p className="text-xl text-muted-foreground tracking-[0.4em] uppercase mb-12">
+        <p className="text-lg text-muted-foreground tracking-[0.3em] uppercase mb-12">
           Ligue de Dek Hockey Newport
         </p>
-        <Link
-          to="/arena"
-          className="inline-flex items-center gap-3 bg-primary text-primary-foreground font-display text-xl font-bold px-10 py-4 rounded-2xl tracking-wider uppercase glow-neon hover:scale-105 transition-transform"
-        >
-          🏒 Mode Aréna
-        </Link>
-        <p className="mt-6 text-sm text-muted-foreground">
-          Affichage plein écran pour projection
-        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+          {navItems.map((item, i) => (
+            <motion.div
+              key={item.to}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.1 }}
+            >
+              <Link
+                to={item.to}
+                className="flex flex-col items-center gap-2 bg-card border border-border hover:border-primary/40 rounded-xl p-6 transition-all hover:scale-105 hover:glow-neon"
+              >
+                <item.icon className="h-8 w-8 text-primary" />
+                <span className="font-display text-lg font-bold tracking-wider uppercase">{item.label}</span>
+                <span className="text-xs text-muted-foreground">{item.desc}</span>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
     </div>
   );
