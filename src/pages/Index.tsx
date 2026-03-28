@@ -12,7 +12,6 @@ const Index = () => {
         transition={{ duration: 0.7 }}
       >
         <img src={ldhnLogo} alt="LDHN" className="w-40 h-40 object-contain mx-auto mb-8" />
-        </div>
         <h1 className="font-display text-6xl md:text-8xl font-bold tracking-wider text-neon mb-4">
           LDHN
         </h1>
