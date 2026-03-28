@@ -14,7 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      matches: {
+        Row: {
+          away_score: number
+          away_team_id: string
+          created_at: string
+          home_score: number
+          home_team_id: string
+          id: string
+          is_live: boolean
+          match_date: string
+          period: string | null
+          status: string
+        }
+        Insert: {
+          away_score?: number
+          away_team_id: string
+          created_at?: string
+          home_score?: number
+          home_team_id: string
+          id?: string
+          is_live?: boolean
+          match_date?: string
+          period?: string | null
+          status?: string
+        }
+        Update: {
+          away_score?: number
+          away_team_id?: string
+          created_at?: string
+          home_score?: number
+          home_team_id?: string
+          id?: string
+          is_live?: boolean
+          match_date?: string
+          period?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_away_team_id_fkey"
+            columns: ["away_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_home_team_id_fkey"
+            columns: ["home_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      players: {
+        Row: {
+          created_at: string
+          first_name: string
+          id: string
+          last_name: string
+          number: number
+          position: string
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          first_name: string
+          id?: string
+          last_name: string
+          number: number
+          position?: string
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          number?: number
+          position?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "players_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          abbr: string
+          color: string
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+        }
+        Insert: {
+          abbr: string
+          color?: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+        }
+        Update: {
+          abbr?: string
+          color?: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
