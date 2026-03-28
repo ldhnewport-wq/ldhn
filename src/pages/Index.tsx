@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import ldhnLogo from "@/assets/ldhn-logo-full.jpg";
 
 const Index = () => {
   return (
@@ -10,9 +11,7 @@ const Index = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
       >
-        <div className="w-24 h-24 rounded-full bg-primary mx-auto mb-8 flex items-center justify-center glow-neon">
-          <span className="font-display text-primary-foreground text-4xl font-bold">L</span>
-        </div>
+        <img src={ldhnLogo} alt="LDHN" className="w-40 h-40 object-contain mx-auto mb-8" />
         <h1 className="font-display text-6xl md:text-8xl font-bold tracking-wider text-neon mb-4">
           LDHN
         </h1>
