@@ -17,7 +17,7 @@ const Index = () => {
           LDHN
         </h1>
         <p className="text-xl text-muted-foreground tracking-[0.4em] uppercase mb-12">
-          Ligue de Hockey du Nord
+          Ligue de Dek Hockey Newport
         </p>
         <Link
           to="/arena"
