@@ -14,6 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
+      match_events: {
+        Row: {
+          assist_player_id: string | null
+          created_at: string
+          event_time: string | null
+          event_type: string
+          id: string
+          match_id: string
+          period: string | null
+          player_id: string | null
+          team_id: string
+        }
+        Insert: {
+          assist_player_id?: string | null
+          created_at?: string
+          event_time?: string | null
+          event_type?: string
+          id?: string
+          match_id: string
+          period?: string | null
+          player_id?: string | null
+          team_id: string
+        }
+        Update: {
+          assist_player_id?: string | null
+          created_at?: string
+          event_time?: string | null
+          event_type?: string
+          id?: string
+          match_id?: string
+          period?: string | null
+          player_id?: string | null
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_events_assist_player_id_fkey"
+            columns: ["assist_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_events_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_events_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_events_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           away_score: number

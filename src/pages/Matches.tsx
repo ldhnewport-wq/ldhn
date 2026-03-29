@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { Plus, ArrowLeft, Trash2 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+import LiveMatchControl from "@/components/matches/LiveMatchControl";
+import { useRealtimeMatches } from "@/hooks/useRealtimeMatches";
 
 type Team = Tables<"teams">;
 
@@ -21,6 +23,8 @@ interface MatchWithTeams {
   period: string | null;
   match_date: string;
   is_live: boolean;
+  home_team_id: string;
+  away_team_id: string;
   home_team: Team;
   away_team: Team;
 }
@@ -32,6 +36,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const Matches = () => {
+  useRealtimeMatches();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -198,21 +203,9 @@ const Matches = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Input
-                      type="number"
-                      value={match.home_score}
-                      onChange={(e) => updateScore.mutate({ id: match.id, field: "home_score", value: parseInt(e.target.value) || 0 })}
-                      className="w-16 h-12 text-center font-display text-3xl font-bold"
-                      min={0}
-                    />
+                    <span className="font-display text-4xl font-bold w-12 text-center">{match.home_score}</span>
                     <span className="font-display text-2xl text-muted-foreground">-</span>
-                    <Input
-                      type="number"
-                      value={match.away_score}
-                      onChange={(e) => updateScore.mutate({ id: match.id, field: "away_score", value: parseInt(e.target.value) || 0 })}
-                      className="w-16 h-12 text-center font-display text-3xl font-bold"
-                      min={0}
-                    />
+                    <span className="font-display text-4xl font-bold w-12 text-center">{match.away_score}</span>
                   </div>
                   <div className="flex items-center gap-3 flex-1">
                     <div className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold" style={{ borderColor: match.away_team.color, color: match.away_team.color }}>
@@ -226,6 +219,7 @@ const Matches = () => {
                     <span className="text-xs bg-arena-red/20 text-arena-red px-2 py-1 rounded-full font-bold uppercase tracking-wider">🔴 En direct</span>
                   </div>
                 )}
+                <LiveMatchControl match={match} />
               </div>
             ))}
           </div>
