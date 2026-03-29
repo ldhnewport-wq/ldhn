@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { Plus, ArrowLeft, Trash2 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+import LiveMatchControl from "@/components/matches/LiveMatchControl";
+import { useRealtimeMatches } from "@/hooks/useRealtimeMatches";
 
 type Team = Tables<"teams">;
 
