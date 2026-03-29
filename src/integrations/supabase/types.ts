@@ -81,37 +81,46 @@ export type Database = {
       }
       matches: {
         Row: {
+          away_coach_initials: string | null
           away_score: number
           away_team_id: string
           created_at: string
+          home_coach_initials: string | null
           home_score: number
           home_team_id: string
           id: string
           is_live: boolean
+          lineup_confirmed: boolean
           match_date: string
           period: string | null
           status: string
         }
         Insert: {
+          away_coach_initials?: string | null
           away_score?: number
           away_team_id: string
           created_at?: string
+          home_coach_initials?: string | null
           home_score?: number
           home_team_id: string
           id?: string
           is_live?: boolean
+          lineup_confirmed?: boolean
           match_date?: string
           period?: string | null
           status?: string
         }
         Update: {
+          away_coach_initials?: string | null
           away_score?: number
           away_team_id?: string
           created_at?: string
+          home_coach_initials?: string | null
           home_score?: number
           home_team_id?: string
           id?: string
           is_live?: boolean
+          lineup_confirmed?: boolean
           match_date?: string
           period?: string | null
           status?: string
@@ -140,6 +149,7 @@ export type Database = {
           id: string
           last_name: string
           number: number
+          photo_url: string | null
           position: string
           team_id: string
         }
@@ -149,6 +159,7 @@ export type Database = {
           id?: string
           last_name: string
           number: number
+          photo_url?: string | null
           position?: string
           team_id: string
         }
@@ -158,6 +169,7 @@ export type Database = {
           id?: string
           last_name?: string
           number?: number
+          photo_url?: string | null
           position?: string
           team_id?: string
         }
