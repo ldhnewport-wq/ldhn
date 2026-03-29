@@ -23,6 +23,8 @@ interface MatchWithTeams {
   period: string | null;
   match_date: string;
   is_live: boolean;
+  home_team_id: string;
+  away_team_id: string;
   home_team: Team;
   away_team: Team;
 }
