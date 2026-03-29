@@ -9,6 +9,7 @@ import Teams from "./pages/Teams.tsx";
 import TeamDetail from "./pages/TeamDetail.tsx";
 import Matches from "./pages/Matches.tsx";
 import Classement from "./pages/Classement.tsx";
+import Admin from "./pages/Admin.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/equipes/:id" element={<TeamDetail />} />
           <Route path="/matchs" element={<Matches />} />
           <Route path="/classement" element={<Classement />} />
+          <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
