@@ -34,6 +34,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const Matches = () => {
+  useRealtimeMatches();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
