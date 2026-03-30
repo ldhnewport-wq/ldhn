@@ -6,6 +6,7 @@ import StandingsSection from "@/components/arena/StandingsSection";
 import TopPlayersSection from "@/components/arena/TopPlayersSection";
 import PlayerOfTheMatchSection from "@/components/arena/PlayerOfTheMatchSection";
 import HighlightsSection from "@/components/arena/HighlightsSection";
+import ReportageSection from "@/components/arena/ReportageSection";
 import ProgressBar from "@/components/arena/ProgressBar";
 import ArenaAdminPanel from "@/components/arena/ArenaAdminPanel";
 
@@ -15,6 +16,7 @@ const ALL_SECTIONS = [
   { component: TopPlayersSection, name: "Meneurs" },
   { component: PlayerOfTheMatchSection, name: "MVP" },
   { component: HighlightsSection, name: "Faits saillants" },
+  { component: ReportageSection, name: "Reportage" },
 ];
 
 const ROTATION_INTERVAL = 12000;
