@@ -11,7 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeMatches } from "@/hooks/useRealtimeMatches";
-import { ArrowLeft, Plus, Trash2, Pencil, Users, Trophy, Gamepad2, Zap, CheckCircle } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Pencil, Users, Trophy, Gamepad2, Zap, CheckCircle, Newspaper, Upload } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import type { Tables } from "@/integrations/supabase/types";
 import LiveMatchControl from "@/components/matches/LiveMatchControl";
 
