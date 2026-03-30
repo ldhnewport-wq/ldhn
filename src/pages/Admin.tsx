@@ -608,6 +608,153 @@ const LineupTab = () => {
   );
 };
 
+// ─── Articles Tab ────────────────────────────────────────────
+const CATEGORIES = [
+  { value: "recap", label: "Résumé de match" },
+  { value: "stars", label: "3 étoiles" },
+  { value: "news", label: "Nouvelles" },
+  { value: "project", label: "Projets à venir" },
+];
+
+const ArticlesTab = () => {
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [category, setCategory] = useState("news");
+  const [imageUrl, setImageUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [published, setPublished] = useState(true);
+  const [uploading, setUploading] = useState(false);
+
+  const { data: articles = [] } = useQuery({
+    queryKey: ["admin-articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("articles").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const resetForm = () => {
+    setEditId(null); setTitle(""); setContent(""); setCategory("news");
+    setImageUrl(""); setVideoUrl(""); setPublished(true);
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `articles/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("media").upload(path, file);
+    if (error) { toast({ title: "Erreur upload", variant: "destructive" }); setUploading(false); return; }
+    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+    setImageUrl(urlData.publicUrl);
+    setUploading(false);
+  };
+
+  const save = useMutation({
+    mutationFn: async () => {
+      const payload = { title, content, category, image_url: imageUrl || null, video_url: videoUrl || null, published };
+      if (editId) {
+        const { error } = await supabase.from("articles").update(payload).eq("id", editId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("articles").insert(payload);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-articles"] });
+      toast({ title: editId ? "Article modifié" : "Article créé" });
+      resetForm(); setOpen(false);
+    },
+  });
+
+  const del = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("articles").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin-articles"] }); },
+  });
+
+  return (
+    <div className="space-y-4">
+      <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) resetForm(); }}>
+        <DialogTrigger asChild>
+          <Button className="gap-2"><Plus className="h-4 w-4" /> Ajouter un article</Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{editId ? "Modifier" : "Nouvel"} article</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Titre</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} /></div>
+            <div>
+              <Label>Catégorie</Label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div><Label>Contenu</Label><Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={5} /></div>
+            <div>
+              <Label>Image</Label>
+              <div className="flex gap-2 items-center">
+                <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="URL ou upload" className="flex-1" />
+                <Label htmlFor="img-upload" className="cursor-pointer">
+                  <div className="inline-flex items-center gap-1 px-3 py-2 rounded-md bg-secondary text-secondary-foreground text-sm hover:bg-secondary/80">
+                    <Upload className="h-4 w-4" /> {uploading ? "..." : "Upload"}
+                  </div>
+                </Label>
+                <input id="img-upload" type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+              </div>
+              {imageUrl && <img src={imageUrl} alt="preview" className="mt-2 h-32 object-cover rounded-lg" />}
+            </div>
+            <div><Label>URL vidéo (YouTube embed)</Label><Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/embed/..." /></div>
+            <div className="flex items-center gap-2">
+              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} id="pub" />
+              <Label htmlFor="pub">Publié</Label>
+            </div>
+            <Button onClick={() => save.mutate()} disabled={!title} className="w-full">
+              {editId ? "Modifier" : "Créer"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="space-y-3">
+        {articles.map((a) => (
+          <Card key={a.id} className="border-border">
+            <CardContent className="p-4 flex items-center gap-4">
+              {a.image_url && <img src={a.image_url} alt="" className="w-16 h-16 rounded-lg object-cover shrink-0" />}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-display font-bold text-foreground truncate">{a.title}</span>
+                  {!a.published && <span className="text-xs text-muted-foreground">(brouillon)</span>}
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {CATEGORIES.find((c) => c.value === a.category)?.label} · {new Date(a.created_at).toLocaleDateString("fr-CA")}
+                </span>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => {
+                setEditId(a.id); setTitle(a.title); setContent(a.content || "");
+                setCategory(a.category); setImageUrl(a.image_url || "");
+                setVideoUrl(a.video_url || ""); setPublished(a.published); setOpen(true);
+              }}><Pencil className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => del.mutate(a.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // ─── Main Admin Page ─────────────────────────────────────────
 const Admin = () => {
   return (
@@ -621,16 +768,18 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="teams" className="space-y-4">
-          <TabsList className="grid grid-cols-4 w-full bg-secondary/50">
+          <TabsList className="grid grid-cols-5 w-full bg-secondary/50">
             <TabsTrigger value="teams" className="gap-1 text-xs sm:text-sm"><Users className="h-4 w-4 hidden sm:block" /> Équipes</TabsTrigger>
             <TabsTrigger value="players" className="gap-1 text-xs sm:text-sm"><Trophy className="h-4 w-4 hidden sm:block" /> Joueurs</TabsTrigger>
             <TabsTrigger value="matches" className="gap-1 text-xs sm:text-sm"><Gamepad2 className="h-4 w-4 hidden sm:block" /> Matchs</TabsTrigger>
             <TabsTrigger value="lineup" className="gap-1 text-xs sm:text-sm"><Zap className="h-4 w-4 hidden sm:block" /> Alignement</TabsTrigger>
+            <TabsTrigger value="articles" className="gap-1 text-xs sm:text-sm"><Newspaper className="h-4 w-4 hidden sm:block" /> Reportage</TabsTrigger>
           </TabsList>
           <TabsContent value="teams"><TeamsTab /></TabsContent>
           <TabsContent value="players"><PlayersTab /></TabsContent>
           <TabsContent value="matches"><MatchesTab /></TabsContent>
           <TabsContent value="lineup"><LineupTab /></TabsContent>
+          <TabsContent value="articles"><ArticlesTab /></TabsContent>
         </Tabs>
       </div>
     </div>
