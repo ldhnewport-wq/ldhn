@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import ldhnLogo from "@/assets/ldhn-logo-full.jpg";
-import { Users, Swords, Trophy, Monitor, Settings } from "lucide-react";
+import { Users, Swords, Trophy, Monitor, Settings, Newspaper } from "lucide-react";
 
 const navItems = [
   { to: "/equipes", icon: Users, label: "Équipes", desc: "Gérer les équipes et alignements" },
   { to: "/matchs", icon: Swords, label: "Matchs", desc: "Créer et scorer les matchs" },
   { to: "/classement", icon: Trophy, label: "Classement", desc: "Voir le classement en temps réel" },
+  { to: "/reportage", icon: Newspaper, label: "Reportage", desc: "Photos, vidéos et nouvelles de la ligue" },
   { to: "/arena", icon: Monitor, label: "Mode Aréna", desc: "Affichage plein écran pour projection" },
   { to: "/admin", icon: Settings, label: "Admin", desc: "Gérer la ligue complète" },
 ];

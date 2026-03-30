@@ -16,6 +16,7 @@ const ALL_SECTIONS = [
   { component: TopPlayersSection, name: "Meneurs" },
   { component: PlayerOfTheMatchSection, name: "MVP" },
   { component: HighlightsSection, name: "Faits saillants" },
+  { component: ReportageSection, name: "Reportage" },
 ];
 
 const ROTATION_INTERVAL = 12000;
