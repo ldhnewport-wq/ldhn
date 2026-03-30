@@ -10,6 +10,7 @@ import TeamDetail from "./pages/TeamDetail.tsx";
 import Matches from "./pages/Matches.tsx";
 import Classement from "./pages/Classement.tsx";
 import Admin from "./pages/Admin.tsx";
+import Reportage from "./pages/Reportage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
