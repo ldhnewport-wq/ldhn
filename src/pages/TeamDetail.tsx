@@ -35,39 +35,6 @@ const TeamDetail = () => {
     },
   });
 
-  const createPlayer = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("players").insert({
-        first_name: firstName,
-        last_name: lastName,
-        number: parseInt(number),
-        position,
-        team_id: id!,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["players", id] });
-      setOpen(false);
-      setFirstName("");
-      setLastName("");
-      setNumber("");
-      setPosition("F");
-      toast({ title: "Joueur ajouté !" });
-    },
-    onError: (e) => toast({ title: "Erreur", description: e.message, variant: "destructive" }),
-  });
-
-  const deletePlayer = useMutation({
-    mutationFn: async (playerId: string) => {
-      const { error } = await supabase.from("players").delete().eq("id", playerId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["players", id] });
-      toast({ title: "Joueur supprimé" });
-    },
-  });
 
   return (
     <div className="min-h-screen bg-arena-gradient p-6">
