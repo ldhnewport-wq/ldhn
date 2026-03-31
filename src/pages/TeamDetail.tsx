@@ -16,13 +16,6 @@ const POSITIONS = [
 
 const TeamDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [open, setOpen] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [number, setNumber] = useState("");
-  const [position, setPosition] = useState("F");
 
   const { data: team } = useQuery({
     queryKey: ["team", id],
