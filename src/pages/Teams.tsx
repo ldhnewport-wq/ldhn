@@ -27,10 +27,8 @@ const Teams = () => {
     },
   });
 
-  // For now, all teams are in "rookies"
   const getTeamsForDivision = (divKey: string) => {
-    if (divKey === "rookies") return teams ?? [];
-    return [];
+    return (teams ?? []).filter((t) => (t as any).division === divKey);
   };
 
   return (
