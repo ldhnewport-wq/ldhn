@@ -224,6 +224,7 @@ export type Database = {
           abbr: string
           color: string
           created_at: string
+          division: string
           id: string
           logo_url: string | null
           name: string
@@ -232,6 +233,7 @@ export type Database = {
           abbr: string
           color?: string
           created_at?: string
+          division?: string
           id?: string
           logo_url?: string | null
           name: string
@@ -240,6 +242,7 @@ export type Database = {
           abbr?: string
           color?: string
           created_at?: string
+          division?: string
           id?: string
           logo_url?: string | null
           name?: string

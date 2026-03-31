@@ -1,0 +1,1 @@
+ALTER TABLE public.teams ADD COLUMN division text NOT NULL DEFAULT 'rookies';
