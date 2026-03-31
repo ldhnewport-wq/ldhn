@@ -1,14 +1,8 @@
-import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
-import { Plus, ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Player = Tables<"players">;
