@@ -81,11 +81,6 @@ const TeamDetail = () => {
                     <td className="py-3 px-4 text-muted-foreground">
                       {POSITIONS.find((p) => p.value === player.position)?.label || player.position}
                     </td>
-                    <td className="py-3 px-4 text-right">
-                      <Button variant="ghost" size="icon" onClick={() => deletePlayer.mutate(player.id)} className="text-muted-foreground hover:text-destructive">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </td>
                   </tr>
                 ))}
               </tbody>
