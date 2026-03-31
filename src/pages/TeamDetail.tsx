@@ -56,44 +56,6 @@ const TeamDetail = () => {
               <h1 className="font-display text-4xl font-bold text-neon">{team?.name || "..."}</h1>
             </div>
           </div>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2"><Plus className="h-4 w-4" /> Ajouter joueur</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Ajouter un joueur</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={(e) => { e.preventDefault(); createPlayer.mutate(); }} className="space-y-4">
-                <div>
-                  <Label>Prénom</Label>
-                  <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-                </div>
-                <div>
-                  <Label>Nom</Label>
-                  <Input value={lastName} onChange={(e) => setLastName(e.target.value)} required />
-                </div>
-                <div>
-                  <Label>Numéro</Label>
-                  <Input type="number" value={number} onChange={(e) => setNumber(e.target.value)} required min={0} max={99} />
-                </div>
-                <div>
-                  <Label>Position</Label>
-                  <Select value={position} onValueChange={setPosition}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {POSITIONS.map((p) => (
-                        <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button type="submit" className="w-full" disabled={createPlayer.isPending}>
-                  {createPlayer.isPending ? "Ajout..." : "Ajouter"}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
         </div>
 
         {isLoading ? (
