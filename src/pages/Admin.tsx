@@ -65,7 +65,7 @@ const TeamsTab = () => {
   const upsert = useMutation({
     mutationFn: async () => {
       if (editId) {
-        const { error } = await supabase.from("teams").update({ name, abbr: abbr.toUpperCase(), color }).eq("id", editId);
+        const { error } = await supabase.from("teams").update({ name, abbr: abbr.toUpperCase(), color, division }).eq("id", editId);
         if (error) throw error;
       } else {
         const { error } = await supabase.from("teams").insert({ name, abbr: abbr.toUpperCase(), color });
