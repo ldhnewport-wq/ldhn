@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronRight, Trophy, Target } from "lucide-react";
+import { ArrowLeft, ChevronRight, Trophy, Target, Shield } from "lucide-react";
 
 const divisions = [
   { key: "rookies", label: "Division Les Rookies" },
@@ -11,7 +11,7 @@ const divisions = [
   { key: "veterans", label: "Division Les Vétérans" },
 ];
 
-type View = "main" | "scorers" | "teams" | "teams-division";
+type View = "main" | "scorers" | "goalies" | "teams" | "teams-division";
 
 const Classement = () => {
   const [view, setView] = useState<View>("main");
@@ -91,6 +91,41 @@ const Classement = () => {
       .sort((a, b) => b.pts - a.pts || b.goals - a.goals);
   };
 
+  const getGoaliesByDivision = (divKey: string) => {
+    const divTeamIds = (teams ?? []).filter((t: any) => t.division === divKey).map((t) => t.id);
+    const goalies = (players ?? []).filter((p) => p.position === "G" && divTeamIds.includes(p.team_id));
+
+    return goalies
+      .map((goalie) => {
+        // Find matches where this goalie's team played
+        const teamMatches = (matches ?? []).filter(
+          (m) => m.home_team_id === goalie.team_id || m.away_team_id === goalie.team_id
+        );
+        let w = 0, l = 0, shutouts = 0, goalsAgainst = 0;
+        teamMatches.forEach((m) => {
+          const isHome = m.home_team_id === goalie.team_id;
+          const homeWon = m.home_score > m.away_score;
+          const tied = m.home_score === m.away_score;
+          const ga = isHome ? m.away_score : m.home_score;
+          goalsAgainst += ga;
+          if (ga === 0) shutouts++;
+          if (tied) { /* tie doesn't count as W or L for goalie */ }
+          else if ((isHome && homeWon) || (!isHome && !homeWon)) w++;
+          else l++;
+        });
+        const gp = teamMatches.length;
+        const gaa = gp > 0 ? goalsAgainst / gp : 0;
+        const winPct = gp > 0 ? (w / gp) * 100 : 0;
+        return { player: goalie, gp, w, l, shutouts, goalsAgainst, gaa, winPct };
+      })
+      .filter((g) => g.gp > 0)
+      .sort((a, b) => b.w - a.w || a.gaa - b.gaa);
+  };
+
+  const formatDec = (n: number) => {
+    return n % 1 === 0 ? n.toFixed(0) : n.toFixed(2);
+  };
+
   const goBack = () => {
     if (view === "teams-division") setView("teams");
     else { setView("main"); setSelectedDivision(null); }
@@ -98,6 +133,7 @@ const Classement = () => {
 
   const getTitle = () => {
     if (view === "scorers") return "Classements des marqueurs";
+    if (view === "goalies") return "Classement des gardiens";
     if (view === "teams" || view === "teams-division") {
       if (selectedDivision) return divisions.find((d) => d.key === selectedDivision)?.label ?? "Classement";
       return "Classement des équipes";
@@ -125,6 +161,14 @@ const Classement = () => {
               onClick={() => setView("scorers")}
             >
               <span className="flex items-center gap-3"><Target className="h-5 w-5" /> Classements des marqueurs</span>
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-between text-lg py-8 border-primary/30 hover:border-primary hover:bg-primary/10"
+              onClick={() => setView("goalies")}
+            >
+              <span className="flex items-center gap-3"><Shield className="h-5 w-5" /> Classement des gardiens</span>
               <ChevronRight className="h-5 w-5" />
             </Button>
             <Button
@@ -167,6 +211,55 @@ const Classement = () => {
                               <td className="py-3 px-3 text-center">{s.goals}</td>
                               <td className="py-3 px-3 text-center">{s.assists}</td>
                               <td className="py-3 px-3 text-center font-bold text-neon">{s.pts}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {view === "goalies" && (
+          <div className="space-y-8">
+            {divisions.map((div) => {
+              const goalies = getGoaliesByDivision(div.key);
+              return (
+                <div key={div.key}>
+                  <h2 className="font-display text-2xl font-bold text-primary mb-4">{div.label}</h2>
+                  {goalies.length === 0 ? (
+                    <p className="text-muted-foreground text-sm mb-4">Aucun gardien.</p>
+                  ) : (
+                    <div className="overflow-x-auto mb-4">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-border text-muted-foreground text-sm uppercase tracking-wider font-display">
+                            <th className="text-left py-2 px-3 w-10">#</th>
+                            <th className="text-left py-2 px-3">Gardien</th>
+                            <th className="text-center py-2 px-3">PJ</th>
+                            <th className="text-center py-2 px-3">V</th>
+                            <th className="text-center py-2 px-3">D</th>
+                            <th className="text-center py-2 px-3">BL</th>
+                            <th className="text-center py-2 px-3">BA</th>
+                            <th className="text-center py-2 px-3">MOY</th>
+                            <th className="text-center py-2 px-3 text-neon">%V</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {goalies.map((g, i) => (
+                            <tr key={g.player.id} className="border-b border-border/50 hover:bg-accent/10 transition-colors">
+                              <td className="py-3 px-3 font-bold text-muted-foreground">{i + 1}</td>
+                              <td className="py-3 px-3 font-semibold">{g.player.first_name} {g.player.last_name}</td>
+                              <td className="py-3 px-3 text-center">{g.gp}</td>
+                              <td className="py-3 px-3 text-center">{g.w}</td>
+                              <td className="py-3 px-3 text-center">{g.l}</td>
+                              <td className="py-3 px-3 text-center">{g.shutouts}</td>
+                              <td className="py-3 px-3 text-center">{g.goalsAgainst}</td>
+                              <td className="py-3 px-3 text-center">{formatDec(g.gaa)}</td>
+                              <td className="py-3 px-3 text-center font-bold text-neon">{formatDec(g.winPct)}%</td>
                             </tr>
                           ))}
                         </tbody>
