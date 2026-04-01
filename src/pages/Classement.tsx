@@ -203,14 +203,15 @@ const Classement = () => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-border text-muted-foreground text-sm uppercase tracking-wider font-display">
-                    <th className="text-left py-3 px-4 w-10">#</th>
-                    <th className="text-left py-3 px-4">Équipe</th>
-                    <th className="text-center py-3 px-4">PJ</th>
-                    <th className="text-center py-3 px-4">V</th>
-                    <th className="text-center py-3 px-4">D</th>
-                    <th className="text-center py-3 px-4 text-neon">PTS</th>
-                  </tr>
+                   <tr className="border-b border-border text-muted-foreground text-sm uppercase tracking-wider font-display">
+                     <th className="text-left py-3 px-4 w-10">#</th>
+                     <th className="text-left py-3 px-4">Équipe</th>
+                     <th className="text-center py-3 px-4">PJ</th>
+                     <th className="text-center py-3 px-4">V</th>
+                     <th className="text-center py-3 px-4">N</th>
+                     <th className="text-center py-3 px-4">D</th>
+                     <th className="text-center py-3 px-4 text-neon">PTS</th>
+                   </tr>
                 </thead>
                 <tbody>
                   {standings.map((s, i) => (
