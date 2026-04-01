@@ -63,13 +63,16 @@ const Classement = () => {
         const teamMatches = (matches ?? []).filter(
           (m) => m.home_team_id === team.id || m.away_team_id === team.id
         );
-        let w = 0, l = 0;
+        let w = 0, l = 0, d = 0;
         teamMatches.forEach((m) => {
           const isHome = m.home_team_id === team.id;
-          const won = isHome ? m.home_score > m.away_score : m.away_score > m.home_score;
-          if (won) w++; else l++;
+          const homeWon = m.home_score > m.away_score;
+          const tied = m.home_score === m.away_score;
+          if (tied) d++;
+          else if ((isHome && homeWon) || (!isHome && !homeWon)) w++;
+          else l++;
         });
-        return { team, gp: teamMatches.length, w, l, pts: w * 2 };
+        return { team, gp: teamMatches.length, w, d, l, pts: w * 2 + d };
       })
       .sort((a, b) => b.pts - a.pts || b.w - a.w);
   };
