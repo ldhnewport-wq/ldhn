@@ -68,7 +68,7 @@ const TeamsTab = () => {
         const { error } = await supabase.from("teams").update({ name, abbr: abbr.toUpperCase(), color, division }).eq("id", editId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("teams").insert({ name, abbr: abbr.toUpperCase(), color });
+        const { error } = await supabase.from("teams").insert({ name, abbr: abbr.toUpperCase(), color, division });
         if (error) throw error;
       }
     },
