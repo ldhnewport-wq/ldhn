@@ -11,7 +11,7 @@ type Team = Tables<"teams">;
 
 const divisions = [
   { key: "rookies", label: "Division Les Rookies" },
-  { key: "youngguns", label: "Division Les Young Guns" },
+  { key: "younguns", label: "Division Les Young Guns" },
   { key: "veterans", label: "Division Les Vétérans" },
 ];
 
