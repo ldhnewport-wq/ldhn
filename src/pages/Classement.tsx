@@ -82,7 +82,7 @@ const Classement = () => {
       .map((player) => {
         const goals = (events ?? []).filter((e) => e.event_type === "goal" && e.player_id === player.id).length;
         const assists = (events ?? []).filter((e) => e.event_type === "assist" && e.player_id === player.id).length;
-        return { player, goals, assists, pts: goals + assists };
+        return { player, goals, assists, pts: goals + (assists * 2) };
       })
       .filter((p) => p.pts > 0)
       .sort((a, b) => b.pts - a.pts || b.goals - a.goals);
