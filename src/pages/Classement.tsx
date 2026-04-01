@@ -228,10 +228,11 @@ const Classement = () => {
                           <span className="font-semibold text-lg">{s.team.name}</span>
                         </div>
                       </td>
-                      <td className="py-4 px-4 text-center text-lg">{s.gp}</td>
-                      <td className="py-4 px-4 text-center text-lg">{s.w}</td>
-                      <td className="py-4 px-4 text-center text-lg">{s.l}</td>
-                      <td className="py-4 px-4 text-center text-2xl font-bold text-neon">{s.pts}</td>
+                       <td className="py-4 px-4 text-center text-lg">{s.gp}</td>
+                       <td className="py-4 px-4 text-center text-lg">{s.w}</td>
+                       <td className="py-4 px-4 text-center text-lg">{s.d}</td>
+                       <td className="py-4 px-4 text-center text-lg">{s.l}</td>
+                       <td className="py-4 px-4 text-center text-2xl font-bold text-neon">{s.pts}</td>
                     </tr>
                   ))}
                 </tbody>
