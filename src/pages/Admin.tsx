@@ -51,6 +51,7 @@ const TeamsTab = () => {
   const [name, setName] = useState("");
   const [abbr, setAbbr] = useState("");
   const [color, setColor] = useState("#00cc55");
+  const [division, setDivision] = useState("rookies");
 
   const { data: teams, isLoading } = useQuery({
     queryKey: ["teams"],
@@ -64,10 +65,10 @@ const TeamsTab = () => {
   const upsert = useMutation({
     mutationFn: async () => {
       if (editId) {
-        const { error } = await supabase.from("teams").update({ name, abbr: abbr.toUpperCase(), color }).eq("id", editId);
+        const { error } = await supabase.from("teams").update({ name, abbr: abbr.toUpperCase(), color, division }).eq("id", editId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("teams").insert({ name, abbr: abbr.toUpperCase(), color });
+        const { error } = await supabase.from("teams").insert({ name, abbr: abbr.toUpperCase(), color, division });
         if (error) throw error;
       }
     },
@@ -88,10 +89,10 @@ const TeamsTab = () => {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["teams"] }); toast({ title: "Supprimée" }); },
   });
 
-  const resetForm = () => { setEditId(null); setName(""); setAbbr(""); setColor("#00cc55"); };
+  const resetForm = () => { setEditId(null); setName(""); setAbbr(""); setColor("#00cc55"); setDivision("rookies"); };
 
   const startEdit = (t: Team) => {
-    setEditId(t.id); setName(t.name); setAbbr(t.abbr); setColor(t.color); setOpen(true);
+    setEditId(t.id); setName(t.name); setAbbr(t.abbr); setColor(t.color); setDivision(t.division); setOpen(true);
   };
 
   return (
@@ -108,6 +109,17 @@ const TeamsTab = () => {
               <div><Label>Nom</Label><Input value={name} onChange={(e) => setName(e.target.value)} required /></div>
               <div><Label>Abréviation (3 lettres)</Label><Input value={abbr} onChange={(e) => setAbbr(e.target.value)} maxLength={4} required /></div>
               <div><Label>Couleur</Label><Input type="color" value={color} onChange={(e) => setColor(e.target.value)} /></div>
+              <div>
+                <Label>Division</Label>
+                <Select value={division} onValueChange={setDivision}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rookies">Les Rookies</SelectItem>
+                    <SelectItem value="younguns">Les Young Guns</SelectItem>
+                    <SelectItem value="veterans">Les Vétérans</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <Button type="submit" className="w-full" disabled={upsert.isPending || !name || !abbr}>
                 {upsert.isPending ? "..." : editId ? "Modifier" : "Créer"}
               </Button>
