@@ -109,6 +109,17 @@ const TeamsTab = () => {
               <div><Label>Nom</Label><Input value={name} onChange={(e) => setName(e.target.value)} required /></div>
               <div><Label>Abréviation (3 lettres)</Label><Input value={abbr} onChange={(e) => setAbbr(e.target.value)} maxLength={4} required /></div>
               <div><Label>Couleur</Label><Input type="color" value={color} onChange={(e) => setColor(e.target.value)} /></div>
+              <div>
+                <Label>Division</Label>
+                <Select value={division} onValueChange={setDivision}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rookies">Les Rookies</SelectItem>
+                    <SelectItem value="younguns">Les Young Guns</SelectItem>
+                    <SelectItem value="veterans">Les Vétérans</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <Button type="submit" className="w-full" disabled={upsert.isPending || !name || !abbr}>
                 {upsert.isPending ? "..." : editId ? "Modifier" : "Créer"}
               </Button>
