@@ -92,7 +92,7 @@ const TeamsTab = () => {
   const resetForm = () => { setEditId(null); setName(""); setAbbr(""); setColor("#00cc55"); setDivision("rookies"); };
 
   const startEdit = (t: Team) => {
-    setEditId(t.id); setName(t.name); setAbbr(t.abbr); setColor(t.color); setOpen(true);
+    setEditId(t.id); setName(t.name); setAbbr(t.abbr); setColor(t.color); setDivision(t.division); setOpen(true);
   };
 
   return (
