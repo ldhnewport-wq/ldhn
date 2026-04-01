@@ -89,7 +89,7 @@ const TeamsTab = () => {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["teams"] }); toast({ title: "Supprimée" }); },
   });
 
-  const resetForm = () => { setEditId(null); setName(""); setAbbr(""); setColor("#00cc55"); };
+  const resetForm = () => { setEditId(null); setName(""); setAbbr(""); setColor("#00cc55"); setDivision("rookies"); };
 
   const startEdit = (t: Team) => {
     setEditId(t.id); setName(t.name); setAbbr(t.abbr); setColor(t.color); setOpen(true);
