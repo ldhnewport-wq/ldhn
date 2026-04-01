@@ -51,6 +51,7 @@ const TeamsTab = () => {
   const [name, setName] = useState("");
   const [abbr, setAbbr] = useState("");
   const [color, setColor] = useState("#00cc55");
+  const [division, setDivision] = useState("rookies");
 
   const { data: teams, isLoading } = useQuery({
     queryKey: ["teams"],
