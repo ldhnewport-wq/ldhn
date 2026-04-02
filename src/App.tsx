@@ -11,6 +11,7 @@ import Matches from "./pages/Matches.tsx";
 import Classement from "./pages/Classement.tsx";
 import Admin from "./pages/Admin.tsx";
 import Reportage from "./pages/Reportage.tsx";
+import LineupLock from "./pages/LineupLock.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/matchs" element={<Matches />} />
           <Route path="/classement" element={<Classement />} />
           <Route path="/reportage" element={<Reportage />} />
+          <Route path="/lineup/:matchId" element={<LineupLock />} />
           <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

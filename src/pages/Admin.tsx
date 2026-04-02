@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeMatches } from "@/hooks/useRealtimeMatches";
-import { ArrowLeft, Plus, Trash2, Pencil, Users, Trophy, Gamepad2, Zap, CheckCircle, Newspaper, Upload, LogOut } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Pencil, Users, Trophy, Gamepad2, Zap, CheckCircle, Newspaper, Upload, LogOut, Lock, Unlock, ExternalLink, History } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import type { Tables } from "@/integrations/supabase/types";
 import LiveMatchControl from "@/components/matches/LiveMatchControl";
@@ -362,11 +362,20 @@ const MatchesTab = () => {
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      // Block going live if lineup not locked
+      if (status === "live") {
+        const { data: appr } = await supabase.from("lineup_approvals").select("locked").eq("match_id", id).maybeSingle();
+        if (!appr?.locked) {
+          throw new Error("L'alignement doit être verrouillé avant de passer en direct");
+        }
+      }
       const update: Record<string, unknown> = { status, is_live: status === "live" };
+      if (status === "live") update.lineup_confirmed = true;
       const { error } = await supabase.from("matches").update(update).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["matches"] }),
+    onError: (e) => toast({ title: "Erreur", description: e.message, variant: "destructive" }),
   });
 
   const deleteMatch = useMutation({
@@ -491,129 +500,147 @@ const LineupTab = () => {
     },
   });
 
-  const upcoming = matches?.filter((m) => m.status !== "final") || [];
-
-  const [selectedMatch, setSelectedMatch] = useState<string>("");
-  const match = upcoming.find((m) => m.id === selectedMatch);
-
-  const { data: homePlayers } = useQuery({
-    queryKey: ["players", match?.home_team_id],
+  const { data: approvals } = useQuery({
+    queryKey: ["lineup_approvals_all"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("players").select("*").eq("team_id", match!.home_team_id).order("number");
+      const { data, error } = await supabase.from("lineup_approvals").select("*");
       if (error) throw error;
-      return data as Player[];
+      return data;
     },
-    enabled: !!match,
   });
 
-  const { data: awayPlayers } = useQuery({
-    queryKey: ["players", match?.away_team_id],
+  const { data: auditLogs } = useQuery({
+    queryKey: ["lineup_audit_log"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("players").select("*").eq("team_id", match!.away_team_id).order("number");
+      const { data, error } = await supabase.from("lineup_audit_log").select("*").order("created_at", { ascending: false }).limit(20);
       if (error) throw error;
-      return data as Player[];
+      return data;
     },
-    enabled: !!match,
   });
 
-  const [homeInitials, setHomeInitials] = useState("");
-  const [awayInitials, setAwayInitials] = useState("");
+  const getApproval = (matchId: string) => approvals?.find((a) => a.match_id === matchId);
 
-  const confirmLineup = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("matches").update({
-        home_coach_initials: homeInitials.toUpperCase(),
-        away_coach_initials: awayInitials.toUpperCase(),
-        lineup_confirmed: true,
-      }).eq("id", selectedMatch);
-      if (error) throw error;
+  const unlockMutation = useMutation({
+    mutationFn: async (matchId: string) => {
+      const approval = getApproval(matchId);
+      if (approval) {
+        const { error } = await supabase.from("lineup_approvals").update({
+          locked: false,
+          home_signed_at: null,
+          away_signed_at: null,
+          home_coach_initials: null,
+          away_coach_initials: null,
+          updated_at: new Date().toISOString(),
+        }).eq("id", approval.id);
+        if (error) throw error;
+      }
+      // Insert audit log
+      await supabase.from("lineup_audit_log").insert({
+        match_id: matchId,
+        action: "unlock",
+        performed_by: "admin",
+        details: "Alignement déverrouillé par admin",
+      });
+      // Reset match lineup_confirmed
+      await supabase.from("matches").update({ lineup_confirmed: false, home_coach_initials: null, away_coach_initials: null }).eq("id", matchId);
     },
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["lineup_approvals_all"] });
+      qc.invalidateQueries({ queryKey: ["lineup_audit_log"] });
       qc.invalidateQueries({ queryKey: ["matches"] });
-      toast({ title: "Alignement confirmé !" });
+      toast({ title: "🔓 Alignement déverrouillé" });
     },
-    onError: (e) => toast({ title: "Erreur", description: e.message, variant: "destructive" }),
   });
 
+  const upcoming = matches?.filter((m) => m.status !== "final") || [];
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h2 className="font-display text-2xl font-bold text-foreground">Validation alignement</h2>
 
-      <div>
-        <Label>Sélectionner un match</Label>
-        <Select value={selectedMatch} onValueChange={(v) => {
-          setSelectedMatch(v);
-          const m = upcoming.find((x) => x.id === v);
-          setHomeInitials(m?.home_coach_initials || "");
-          setAwayInitials(m?.away_coach_initials || "");
-        }}>
-          <SelectTrigger><SelectValue placeholder="Choisir un match..." /></SelectTrigger>
-          <SelectContent>
-            {upcoming.map((m) => (
-              <SelectItem key={m.id} value={m.id}>
-                {m.home_team.abbr} vs {m.away_team.abbr} — {new Date(m.match_date).toLocaleDateString("fr-CA")}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {/* Match list with lock status */}
+      <div className="space-y-3">
+        {upcoming.map((m) => {
+          const appr = getApproval(m.id);
+          const locked = appr?.locked === true;
+          return (
+            <Card key={m.id} className={`border-l-4 ${locked ? "border-l-primary" : "border-l-muted"}`}>
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-display font-bold text-sm">{m.home_team.abbr} vs {m.away_team.abbr}</span>
+                    <p className="text-xs text-muted-foreground">{new Date(m.match_date).toLocaleDateString("fr-CA")}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {locked ? (
+                      <span className="flex items-center gap-1 text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">
+                        <Lock className="h-3 w-3" /> VERROUILLÉ
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Non verrouillé</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Signature status */}
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className={`p-2 rounded text-center ${appr?.home_signed_at ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                    <p className="font-bold">{m.home_team.abbr}</p>
+                    {appr?.home_signed_at ? (
+                      <p>✅ {appr.home_coach_initials} — {new Date(appr.home_signed_at).toLocaleTimeString("fr-CA", { hour: "2-digit", minute: "2-digit" })}</p>
+                    ) : (
+                      <p>⏳ En attente</p>
+                    )}
+                  </div>
+                  <div className={`p-2 rounded text-center ${appr?.away_signed_at ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                    <p className="font-bold">{m.away_team.abbr}</p>
+                    {appr?.away_signed_at ? (
+                      <p>✅ {appr.away_coach_initials} — {new Date(appr.away_signed_at).toLocaleTimeString("fr-CA", { hour: "2-digit", minute: "2-digit" })}</p>
+                    ) : (
+                      <p>⏳ En attente</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <a href={`/lineup/${m.id}`} target="_blank" rel="noopener noreferrer" className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full gap-1 text-xs">
+                      <ExternalLink className="h-3 w-3" /> Ouvrir page signature
+                    </Button>
+                  </a>
+                  {locked && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="gap-1 text-xs"
+                      onClick={() => unlockMutation.mutate(m.id)}
+                      disabled={unlockMutation.isPending}
+                    >
+                      <Unlock className="h-3 w-3" /> Déverrouiller
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+        {upcoming.length === 0 && <p className="text-muted-foreground text-center py-8">Aucun match à venir</p>}
       </div>
 
-      {match && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {/* Home */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base" style={{ color: match.home_team.color }}>
-                {match.home_team.name} (Local)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {homePlayers?.map((p) => (
-                <div key={p.id} className="text-sm flex gap-2 items-center">
-                  <span className="font-bold text-muted-foreground w-8">#{p.number}</span>
-                  <span>{p.first_name} {p.last_name}</span>
-                  <span className="text-xs text-muted-foreground ml-auto">{POSITIONS.find((pos) => pos.value === p.position)?.label}</span>
-                </div>
-              ))}
-              {(!homePlayers || homePlayers.length === 0) && <p className="text-sm text-muted-foreground">Aucun joueur enregistré</p>}
-              <div className="pt-2 border-t border-border">
-                <Label className="text-xs">Initiales coach</Label>
-                <Input value={homeInitials} onChange={(e) => setHomeInitials(e.target.value)} placeholder="Ex: JD" maxLength={4} className="h-8 text-sm" />
+      {/* Audit log */}
+      {auditLogs && auditLogs.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+            <History className="h-4 w-4" /> Historique des modifications
+          </h3>
+          <div className="space-y-1">
+            {auditLogs.map((log) => (
+              <div key={log.id} className="text-xs bg-muted/30 rounded px-3 py-2 flex items-center justify-between">
+                <span>{log.details || log.action}</span>
+                <span className="text-muted-foreground">{new Date(log.created_at).toLocaleString("fr-CA")}</span>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Away */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base" style={{ color: match.away_team.color }}>
-                {match.away_team.name} (Visiteur)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {awayPlayers?.map((p) => (
-                <div key={p.id} className="text-sm flex gap-2 items-center">
-                  <span className="font-bold text-muted-foreground w-8">#{p.number}</span>
-                  <span>{p.first_name} {p.last_name}</span>
-                  <span className="text-xs text-muted-foreground ml-auto">{POSITIONS.find((pos) => pos.value === p.position)?.label}</span>
-                </div>
-              ))}
-              {(!awayPlayers || awayPlayers.length === 0) && <p className="text-sm text-muted-foreground">Aucun joueur enregistré</p>}
-              <div className="pt-2 border-t border-border">
-                <Label className="text-xs">Initiales coach</Label>
-                <Input value={awayInitials} onChange={(e) => setAwayInitials(e.target.value)} placeholder="Ex: MB" maxLength={4} className="h-8 text-sm" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="sm:col-span-2">
-            <Button className="w-full gap-2" onClick={() => confirmLineup.mutate()} disabled={confirmLineup.isPending || !homeInitials || !awayInitials}>
-              <CheckCircle className="h-4 w-4" />
-              {match.lineup_confirmed ? "Mettre à jour la confirmation" : "Confirmer l'alignement"}
-            </Button>
-            {match.lineup_confirmed && (
-              <p className="text-xs text-primary text-center mt-2">✓ Alignement déjà confirmé — {match.home_coach_initials} / {match.away_coach_initials}</p>
-            )}
+            ))}
           </div>
         </div>
       )}

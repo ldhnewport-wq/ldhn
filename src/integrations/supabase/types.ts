@@ -50,6 +50,91 @@ export type Database = {
         }
         Relationships: []
       }
+      lineup_approvals: {
+        Row: {
+          away_coach_initials: string | null
+          away_signed_at: string | null
+          created_at: string
+          home_coach_initials: string | null
+          home_signed_at: string | null
+          id: string
+          locked: boolean
+          locked_at: string | null
+          match_id: string
+          unlocked_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          away_coach_initials?: string | null
+          away_signed_at?: string | null
+          created_at?: string
+          home_coach_initials?: string | null
+          home_signed_at?: string | null
+          id?: string
+          locked?: boolean
+          locked_at?: string | null
+          match_id: string
+          unlocked_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          away_coach_initials?: string | null
+          away_signed_at?: string | null
+          created_at?: string
+          home_coach_initials?: string | null
+          home_signed_at?: string | null
+          id?: string
+          locked?: boolean
+          locked_at?: string | null
+          match_id?: string
+          unlocked_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lineup_approvals_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: true
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lineup_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: string | null
+          id: string
+          match_id: string
+          performed_by: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          match_id: string
+          performed_by?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          match_id?: string
+          performed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lineup_audit_log_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_events: {
         Row: {
           assist_player_id: string | null
