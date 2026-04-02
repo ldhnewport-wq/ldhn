@@ -11,6 +11,7 @@ import Matches from "./pages/Matches.tsx";
 import Classement from "./pages/Classement.tsx";
 import Admin from "./pages/Admin.tsx";
 import Reportage from "./pages/Reportage.tsx";
+import LineupLock from "./pages/LineupLock.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
