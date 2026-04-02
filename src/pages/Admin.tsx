@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -11,10 +11,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeMatches } from "@/hooks/useRealtimeMatches";
-import { ArrowLeft, Plus, Trash2, Pencil, Users, Trophy, Gamepad2, Zap, CheckCircle, Newspaper, Upload } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Pencil, Users, Trophy, Gamepad2, Zap, CheckCircle, Newspaper, Upload, LogOut } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import type { Tables } from "@/integrations/supabase/types";
 import LiveMatchControl from "@/components/matches/LiveMatchControl";
+import type { Session } from "@supabase/supabase-js";
 
 type Team = Tables<"teams">;
 type Player = Tables<"players">;
@@ -767,8 +768,73 @@ const ArticlesTab = () => {
   );
 };
 
+// ─── Login Form ──────────────────────────────────────────────
+const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+    if (err) {
+      setError("Identifiants invalides");
+      setLoading(false);
+    } else {
+      onLogin();
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-arena-gradient flex items-center justify-center p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-center font-display text-2xl">Admin — Connexion</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Courriel</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Mot de passe</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            </div>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Connexion…" : "Se connecter"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
 // ─── Main Admin Page ─────────────────────────────────────────
 const Admin = () => {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setLoading(false);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) return <div className="min-h-screen bg-arena-gradient flex items-center justify-center"><span className="text-muted-foreground">Chargement…</span></div>;
+  if (!session) return <AdminLogin onLogin={() => {}} />;
+
   return (
     <div className="min-h-screen bg-arena-gradient p-4 sm:p-6">
       <div className="max-w-5xl mx-auto">
@@ -777,6 +843,11 @@ const Admin = () => {
             <Button variant="ghost" size="icon"><ArrowLeft className="h-5 w-5" /></Button>
           </Link>
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-neon">Admin</h1>
+          <div className="ml-auto">
+            <Button variant="outline" size="sm" onClick={() => supabase.auth.signOut()}>
+              <LogOut className="h-4 w-4 mr-1" /> Déconnexion
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="teams" className="space-y-4">
