@@ -362,11 +362,20 @@ const MatchesTab = () => {
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      // Block going live if lineup not locked
+      if (status === "live") {
+        const { data: appr } = await supabase.from("lineup_approvals").select("locked").eq("match_id", id).maybeSingle();
+        if (!appr?.locked) {
+          throw new Error("L'alignement doit être verrouillé avant de passer en direct");
+        }
+      }
       const update: Record<string, unknown> = { status, is_live: status === "live" };
+      if (status === "live") update.lineup_confirmed = true;
       const { error } = await supabase.from("matches").update(update).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["matches"] }),
+    onError: (e) => toast({ title: "Erreur", description: e.message, variant: "destructive" }),
   });
 
   const deleteMatch = useMutation({
