@@ -801,17 +801,38 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-    if (err) {
-      setError("Identifiants invalides");
-      setLoading(false);
+    if (isSignUp) {
+      const { error: err } = await supabase.auth.signUp({ email, password });
+      if (err) {
+        setError(err.message);
+        setLoading(false);
+      } else {
+        toast({ title: "Compte créé avec succès !" });
+        setIsSignUp(false);
+        // Auto-login after signup (auto-confirm is enabled)
+        const { error: loginErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (loginErr) {
+          setError("Compte créé, veuillez vous connecter.");
+        } else {
+          onLogin();
+        }
+        setLoading(false);
+      }
     } else {
-      onLogin();
+      const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+      if (err) {
+        setError("Identifiants invalides");
+        setLoading(false);
+      } else {
+        onLogin();
+      }
     }
   };
 
@@ -819,7 +840,9 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
     <div className="min-h-screen bg-arena-gradient flex items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-center font-display text-2xl">Admin — Connexion</CardTitle>
+          <CardTitle className="text-center font-display text-2xl">
+            Admin — {isSignUp ? "Créer un compte" : "Connexion"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -833,7 +856,10 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Connexion…" : "Se connecter"}
+              {loading ? (isSignUp ? "Création…" : "Connexion…") : (isSignUp ? "Créer le compte" : "Se connecter")}
+            </Button>
+            <Button type="button" variant="link" className="w-full" onClick={() => { setIsSignUp(!isSignUp); setError(""); }}>
+              {isSignUp ? "Déjà un compte ? Se connecter" : "Créer un nouveau compte"}
             </Button>
           </form>
         </CardContent>
