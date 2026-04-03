@@ -93,8 +93,9 @@ const LiveScoresSection = () => {
     },
   });
 
-  const liveMatches = matches?.filter((m) => m.is_live) || [];
-  const recentMatches = matches?.filter((m) => m.status === "final") || [];
+  const validMatches = matches?.filter((m) => m.home_team && m.away_team) || [];
+  const liveMatches = validMatches.filter((m) => m.is_live);
+  const recentMatches = validMatches.filter((m) => m.status === "final");
   const displayMatches = [...liveMatches, ...recentMatches.slice(0, Math.max(0, 4 - liveMatches.length))];
 
   if (displayMatches.length === 0) {
