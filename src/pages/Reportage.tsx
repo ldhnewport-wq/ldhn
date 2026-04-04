@@ -120,10 +120,10 @@ const Reportage = () => {
                     <p className="text-muted-foreground whitespace-pre-line">{article.content}</p>
                   )}
                   {article.video_url && toEmbedUrl(article.video_url) && (
-                    <div className="mt-4 aspect-video rounded-lg overflow-hidden bg-muted">
+                    <div className="mt-4 w-full rounded-lg overflow-hidden bg-muted" style={{ aspectRatio: '16/9' }}>
                       <iframe
                         src={toEmbedUrl(article.video_url)!}
-                        className="w-full h-full"
+                        className="w-full h-full border-0"
                         allowFullScreen
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         title={article.title}
