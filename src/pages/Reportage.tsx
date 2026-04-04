@@ -93,12 +93,13 @@ const Reportage = () => {
                   {article.content && (
                     <p className="text-muted-foreground whitespace-pre-line">{article.content}</p>
                   )}
-                  {article.video_url && (
+                  {article.video_url && toEmbedUrl(article.video_url) && (
                     <div className="mt-4 aspect-video rounded-lg overflow-hidden bg-muted">
                       <iframe
-                        src={article.video_url}
+                        src={toEmbedUrl(article.video_url)!}
                         className="w-full h-full"
                         allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         title={article.title}
                       />
                     </div>
