@@ -4,6 +4,20 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Newspaper, Star, Camera, Video } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+
+const toEmbedUrl = (url: string): string | null => {
+  if (!url) return null;
+  let videoId: string | null = null;
+  try {
+    const u = new URL(url);
+    if (u.hostname === "youtu.be") {
+      videoId = u.pathname.slice(1);
+    } else if (u.hostname.includes("youtube.com")) {
+      videoId = u.searchParams.get("v") || u.pathname.split("/embed/")[1] || null;
+    }
+  } catch { return url; }
+  return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+};
 import { Badge } from "@/components/ui/badge";
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: React.ElementType; color: string }> = {
