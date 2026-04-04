@@ -130,23 +130,41 @@ const TeamsTab = () => {
       </div>
 
       {isLoading ? <p className="text-muted-foreground">Chargement...</p> : (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {teams?.map((t) => (
-            <Card key={t.id} className="border-l-4" style={{ borderLeftColor: t.color }}>
-              <CardContent className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold border-2" style={{ borderColor: t.color, color: t.color }}>
-                    {t.abbr}
+        <div className="space-y-6">
+          {[
+            { key: "rookies", label: "Les Rookies" },
+            { key: "younguns", label: "Les Young Guns" },
+            { key: "veterans", label: "Les Vétérans" },
+          ].map((div) => {
+            const divTeams = teams?.filter((t) => t.division === div.key) ?? [];
+            return (
+              <div key={div.key}>
+                <h3 className="text-lg font-bold mb-2 text-primary">{div.label}</h3>
+                {divTeams.length === 0 ? (
+                  <p className="text-muted-foreground text-sm ml-2">Aucune équipe</p>
+                ) : (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {divTeams.map((t) => (
+                      <Card key={t.id} className="border-l-4" style={{ borderLeftColor: t.color }}>
+                        <CardContent className="flex items-center justify-between p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold border-2" style={{ borderColor: t.color, color: t.color }}>
+                              {t.abbr}
+                            </div>
+                            <span className="font-semibold">{t.name}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(t)}><Pencil className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => remove.mutate(t.id)}><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                  <span className="font-semibold">{t.name}</span>
-                </div>
-                <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(t)}><Pencil className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => remove.mutate(t.id)}><Trash2 className="h-4 w-4" /></Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
