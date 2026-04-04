@@ -100,7 +100,7 @@ const Reportage = () => {
                   <img
                     src={article.image_url}
                     alt={article.title}
-                    className="w-full h-56 object-cover"
+                    className="w-full max-h-[600px] object-contain bg-muted"
                   />
                 )}
                 <CardContent className="p-6">
