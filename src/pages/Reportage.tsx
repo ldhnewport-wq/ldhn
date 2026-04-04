@@ -7,16 +7,42 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const toEmbedUrl = (url: string): string | null => {
   if (!url) return null;
-  let videoId: string | null = null;
   try {
     const u = new URL(url);
+    // YouTube
     if (u.hostname === "youtu.be") {
-      videoId = u.pathname.slice(1);
-    } else if (u.hostname.includes("youtube.com")) {
-      videoId = u.searchParams.get("v") || u.pathname.split("/embed/")[1] || null;
+      return `https://www.youtube.com/embed/${u.pathname.slice(1)}`;
+    }
+    if (u.hostname.includes("youtube.com")) {
+      const id = u.searchParams.get("v") || u.pathname.split("/embed/")[1];
+      return id ? `https://www.youtube.com/embed/${id}` : url;
+    }
+    // Facebook
+    if (u.hostname.includes("facebook.com") || u.hostname.includes("fb.watch")) {
+      return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+    }
+    // Instagram
+    if (u.hostname.includes("instagram.com")) {
+      const path = u.pathname.replace(/\/$/, "");
+      return `https://www.instagram.com${path}/embed`;
+    }
+    // TikTok
+    if (u.hostname.includes("tiktok.com")) {
+      const match = u.pathname.match(/video\/(\d+)/);
+      if (match) return `https://www.tiktok.com/embed/v2/${match[1]}`;
+    }
+    // Vimeo
+    if (u.hostname.includes("vimeo.com")) {
+      const id = u.pathname.split("/").filter(Boolean).pop();
+      return `https://player.vimeo.com/video/${id}`;
+    }
+    // Twitch
+    if (u.hostname.includes("twitch.tv")) {
+      const channel = u.pathname.split("/").filter(Boolean)[0];
+      return `https://player.twitch.tv/?channel=${channel}&parent=${window.location.hostname}`;
     }
   } catch { return url; }
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+  return url;
 };
 import { Badge } from "@/components/ui/badge";
 
