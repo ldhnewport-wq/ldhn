@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+supabase/config.toml
+https://vwaqwzhhjesduhlmrqcm.supabase.co
+SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtZGp4d2VrYXR2YXB1eGNwdW1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MjM4MDksImV4cCI6MjA5MDI5OTgwOX0.uVd1rwHjyF0abHHpqYL-rsAVzWeGFg4t1oU0bC_F6WY"
