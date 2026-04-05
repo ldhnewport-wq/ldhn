@@ -1,3 +1,5 @@
-# Welcome to your Lovable project
+# LIGUE DE DEK HOCKEY NEWPORT
 
-TODO: Document your project here
+Site officiel de la ligue de dek hockey de Newport en Gaspésie.
+Administrateurs: M. Pierre-Paul Blais en collaboration avec le service des loisirs de la ville de chandler.
+
