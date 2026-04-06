@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 import { useRealtimeMatches } from "@/hooks/useRealtimeMatches";
 
@@ -51,12 +51,6 @@ const Matches = () => {
             <Button variant="ghost" size="icon"><ArrowLeft className="h-5 w-5" /></Button>
           </Link>
           <h1 className="font-display text-4xl font-bold text-neon">Matchs</h1>
-          <Link to="/horaire" className="ml-auto">
-            <Button variant="outline" size="sm" className="gap-2">
-              <Calendar className="h-4 w-4" />
-              Horaire complet
-            </Button>
-          </Link>
         </div>
 
         {isLoading ? (
