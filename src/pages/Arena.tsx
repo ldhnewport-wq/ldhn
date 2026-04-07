@@ -9,6 +9,7 @@ import HighlightsSection from "@/components/arena/HighlightsSection";
 import ReportageSection from "@/components/arena/ReportageSection";
 import ProgressBar from "@/components/arena/ProgressBar";
 import ArenaAdminPanel from "@/components/arena/ArenaAdminPanel";
+import TodayScheduleBar from "@/components/arena/TodayScheduleBar";
 
 const ALL_SECTIONS = [
   { component: LiveScoresSection, name: "Scores" },
