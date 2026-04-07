@@ -108,6 +108,7 @@ const Arena = () => {
           )}
         </AnimatePresence>
       </div>
+      <TodayScheduleBar />
       <ProgressBar
         duration={ROTATION_INTERVAL}
         currentSection={progressIndex}
