@@ -7,73 +7,31 @@ import {
   ArrowLeft 
 } from 'lucide-react';
 
-/**
- * NOTE TECHNIQUE :
- * Pour éviter les erreurs de compilation dans cet aperçu, j'ai simulé les données.
- * Dans ton projet ldhnewport.ca, décommente les lignes d'importations ci-dessous.
- */
-// import { useQuery } from "@tanstack/react-query";
-// import { supabase } from "@/integrations/supabase/client";
-// import { useRealtimeMatches } from "@/hooks/useRealtimeMatches";
 
-const STATUS_LABELS = {
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeMatches } from "@/hooks/useRealtimeMatches";
+
+const STATUS_LABELS: Record<string, string> = {
   scheduled: "Programmé",
   live: "En cours",
   final: "Final",
 };
+const Matches = () => {
+  const [matches] = useState(MOCK_MATCHES);
+  const isLoading = false;
 
-// Simulation des données Supabase (Ordre chronologique : Avril à Mai)
-const MOCK_MATCHES = [
-  {
-    id: "1",
-    match_date: "2026-04-20T18:30:00",
-    home_score: 0,
-    away_score: 0,
-    status: "scheduled",
-    surface: "Surface Newport A",
-    home_team: { name: "LES CORBEAUX", abbr: "COR", color: "#ff4444", logo_url: "https://api.dicebear.com/7.x/identicon/svg?seed=corbeaux" },
-    away_team: { name: "LES RENARDS", abbr: "REN", color: "#ffaa00", logo_url: "https://api.dicebear.com/7.x/identicon/svg?seed=renards" }
-  },
-  {
-    id: "2",
-    match_date: "2026-04-20T19:45:00",
-    home_score: 0,
-    away_score: 0,
-    status: "scheduled",
-    surface: "Surface Newport B",
-    home_team: { name: "LES AIGLES", abbr: "AIG", color: "#00cc55", logo_url: "https://api.dicebear.com/7.x/identicon/svg?seed=aigles" },
-    away_team: { name: "LES GRIZZLYS", abbr: "GRI", color: "#4444ff", logo_url: "https://api.dicebear.com/7.x/identicon/svg?seed=grizzlys" }
-  },
-  {
-    id: "3",
-    match_date: "2026-05-15T18:00:00",
-    home_score: 0,
-    away_score: 0,
-    status: "scheduled",
-    surface: "Surface Newport A",
-    home_team: { name: "LES CASTORS", abbr: "CAS", color: "#996633", logo_url: "https://api.dicebear.com/7.x/identicon/svg?seed=castors" },
-    away_team: { name: "LES LYNX", abbr: "LYX", color: "#cccccc", logo_url: "https://api.dicebear.com/7.x/identicon/svg?seed=lynx" }
-  }
-];
-
-const App = () => {
-  // Simule le chargement des données
-  const [matches, setMatches] = useState(MOCK_MATCHES);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Helper pour l'heure (Fix Heure)
-  const formatTime = (dateStr) => {
+  // --- HELPERS DE FORMATAGE ---
+  const formatTime = (dateStr: string) => {
     if (!dateStr) return "--:--";
-    const date = new Date(dateStr);
-    return date.toLocaleTimeString("fr-CA", {
+    return new Date(dateStr).toLocaleTimeString("fr-CA", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false
     });
   };
 
-  // Helper pour la date (20 avril 2026)
-  const formatDate = (dateStr) => {
+  const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString("fr-CA", {
       day: "numeric",
@@ -83,119 +41,103 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white p-4 sm:p-8 font-sans">
+    <div className="min-h-screen bg-[#0a0a0a] text-white p-4 sm:p-8 font-sans selection:bg-[#00cc55]/30">
       <div className="max-w-5xl mx-auto">
         
-        {/* Header avec bouton retour */}
-        <div className="flex items-center gap-4 mb-10">
-          <button className="p-2 hover:bg-white/5 rounded-full transition-colors text-slate-500 hover:text-[#00cc55]">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-12">
+          <div className="p-2 bg-white/5 rounded-full text-slate-500 hover:text-[#00cc55] transition-colors cursor-pointer">
             <ArrowLeft size={24} />
-          </button>
+          </div>
           <div>
             <h1 className="text-4xl font-black text-[#00cc55] italic uppercase tracking-tighter leading-none shadow-neon">
               Calendrier
             </h1>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mt-1">Saison 2026 • Newport</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mt-1 italic">Saison 2026 • LDHN Newport</p>
           </div>
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#00cc55]"></div>
-          </div>
+          <div className="flex justify-center py-20 animate-pulse">Chargement de l'aréna...</div>
         ) : (
           <div className="grid gap-6">
             {matches
-              // Tri chronologique du premier au dernier
+              // TRI CHRONOLOGIQUE : Du 20 avril jusqu'en mai
               .sort((a, b) => new Date(a.match_date).getTime() - new Date(b.match_date).getTime())
               .map((match) => (
-              <div key={match.id} className="bg-[#141414] rounded-[2rem] border border-white/5 shadow-2xl overflow-hidden group hover:border-[#00cc55]/40 transition-all duration-300">
+              <div key={match.id} className="bg-[#141414] rounded-[2rem] border border-white/5 shadow-2xl overflow-hidden group hover:border-[#00cc55]/40 transition-all duration-500">
                 
-                {/* Info Bar (Date & Heure) */}
+                {/* Info Bar (Fix Heure) */}
                 <div className="bg-[#1a1a1a] px-6 py-3 flex justify-between items-center border-b border-white/5">
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">
                       <CalendarIcon size={12} className="text-[#00cc55]" />
                       {formatDate(match.match_date)}
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-black text-white uppercase tracking-widest bg-slate-800 px-3 py-1 rounded-md leading-none">
+                    <div className="flex items-center gap-2 text-[10px] font-black text-white uppercase tracking-widest bg-slate-800 px-3 py-1 rounded-md shadow-inner">
                       <Clock size={12} className="text-[#00cc55]" />
                       {formatTime(match.match_date)}
                     </div>
                   </div>
-                  <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-slate-800 text-slate-500">
+                  <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-slate-800 text-slate-500">
                     {STATUS_LABELS[match.status] || match.status}
                   </span>
                 </div>
 
-                {/* Match Card Content */}
+                {/* Match Card Content (Fix Logos) */}
                 <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-8 relative">
                   
-                  {/* Home Team */}
+                  {/* Domicile */}
                   <div className="flex flex-col sm:flex-row items-center gap-4 flex-1 md:justify-end text-center md:text-right">
-                    <div className="order-2 sm:order-1">
-                      <span className="block font-black text-lg uppercase tracking-tight text-white leading-none">
-                        {match.home_team.name}
-                      </span>
-                    </div>
-                    <div className="relative order-1 sm:order-2 shrink-0">
-                      <div 
-                        className="w-20 h-20 rounded-2xl flex items-center justify-center border-2 overflow-hidden bg-black/50 shadow-inner group-hover:scale-105 transition-transform duration-500"
-                        style={{ borderColor: match.home_team.color }}
-                      >
+                    <span className="block font-black text-lg sm:text-xl uppercase tracking-tight text-white leading-none order-2 sm:order-1">
+                      {match.home_team.name}
+                    </span>
+                    <div className="relative shrink-0 order-1 sm:order-2">
+                      <div className="w-20 h-20 rounded-2xl flex items-center justify-center border-2 overflow-hidden bg-black/50 shadow-inner group-hover:scale-105 transition-transform duration-500" style={{ borderColor: match.home_team.color }}>
                         {match.home_team.logo_url ? (
                           <img src={match.home_team.logo_url} className="w-full h-full object-contain p-2" alt="" />
                         ) : (
-                          <span className="text-xl font-black italic" style={{ color: match.home_team.color }}>
-                            {match.home_team.abbr}
-                          </span>
+                          <span className="text-xl font-black italic" style={{ color: match.home_team.color }}>{match.home_team.abbr}</span>
                         )}
                       </div>
                       <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-4 border-[#141414]" style={{ backgroundColor: match.home_team.color }}></div>
                     </div>
                   </div>
 
-                  {/* VS Section */}
+                  {/* VS */}
                   <div className="flex flex-col items-center px-4 shrink-0">
                     <div className="flex items-center gap-6">
-                      <span className="text-5xl font-black italic w-14 text-center text-slate-800">0</span>
+                      <span className="text-5xl font-black italic w-14 text-center text-white">{match.home_score}</span>
                       <div className="flex flex-col items-center gap-1">
                          <div className="h-1 w-8 bg-[#00cc55] rounded-full shadow-[0_0_12px_#00cc55]"></div>
                          <span className="text-[10px] font-black text-slate-700 uppercase italic">VS</span>
                          <div className="h-1 w-8 bg-[#00cc55] rounded-full shadow-[0_0_12px_#00cc55]"></div>
                       </div>
-                      <span className="text-5xl font-black italic w-14 text-center text-slate-800">0</span>
+                      <span className="text-5xl font-black italic w-14 text-center text-white">{match.away_score}</span>
                     </div>
                     {match.surface && (
                       <div className="mt-5 bg-slate-900/50 px-4 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
                          <MapPin size={12} className="text-[#00cc55]" />
-                         <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{match.surface}</span>
+                         <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{match.surface}</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Away Team */}
+                  {/* Visiteur */}
                   <div className="flex flex-col sm:flex-row items-center gap-4 flex-1 md:justify-start text-center md:text-left">
                     <div className="relative shrink-0">
-                      <div 
-                        className="w-20 h-20 rounded-2xl flex items-center justify-center border-2 overflow-hidden bg-black/50 shadow-inner group-hover:scale-105 transition-transform duration-500"
-                        style={{ borderColor: match.away_team.color }}
-                      >
+                      <div className="w-20 h-20 rounded-2xl flex items-center justify-center border-2 overflow-hidden bg-black/50 shadow-inner group-hover:scale-105 transition-transform duration-500" style={{ borderColor: match.away_team.color }}>
                         {match.away_team.logo_url ? (
                           <img src={match.away_team.logo_url} className="w-full h-full object-contain p-2" alt="" />
                         ) : (
-                          <span className="text-xl font-black italic" style={{ color: match.away_team.color }}>
-                            {match.away_team.abbr}
-                          </span>
+                          <span className="text-xl font-black italic" style={{ color: match.away_team.color }}>{match.away_team.abbr}</span>
                         )}
                       </div>
                       <div className="absolute -bottom-1 -left-1 w-5 h-5 rounded-full border-4 border-[#141414]" style={{ backgroundColor: match.away_team.color }}></div>
                     </div>
-                    <div>
-                      <span className="block font-black text-lg uppercase tracking-tight text-white leading-none">
-                        {match.away_team.name}
-                      </span>
-                    </div>
+                    <span className="block font-black text-lg sm:text-xl uppercase tracking-tight text-white leading-none">
+                      {match.away_team.name}
+                    </span>
                   </div>
 
                 </div>
@@ -204,7 +146,7 @@ const App = () => {
           </div>
         )}
 
-        <div className="mt-20 pt-8 border-t border-white/5 text-center">
+        <div className="mt-20 pt-10 border-t border-white/5 text-center opacity-40">
            <p className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.4em]">LDHN Newport • Ligue de Dek Hockey Jeunesse</p>
         </div>
       </div>
@@ -212,4 +154,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Matches;
