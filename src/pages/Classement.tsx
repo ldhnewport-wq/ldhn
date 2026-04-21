@@ -36,15 +36,17 @@ const Classement = () => {
   });
 
   const { data: events } = useQuery({
-    queryKey: ["match-events-goals"],
+    queryKey: ["match-events-goals-v2"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("match_events")
-        .select("*, players!match_events_player_id_fkey(first_name, last_name, team_id)")
+        .select("id, event_type, player_id, assist_player_id, match_id, team_id")
         .eq("event_type", "goal");
       if (error) throw error;
       return data;
     },
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const { data: players } = useQuery({
