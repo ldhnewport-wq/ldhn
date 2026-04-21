@@ -105,7 +105,7 @@ const LineupLock = () => {
       if (!homeInitials.trim()) throw new Error("Initiales requises");
       if (approval) {
         if (approval.home_signed_at) throw new Error("Déjà signé");
-        const updates: Record<string, unknown> = {
+        const updates: { home_coach_initials: string; home_signed_at: string; updated_at: string; locked?: boolean; locked_at?: string } = {
           home_coach_initials: homeInitials.toUpperCase(),
           home_signed_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -141,7 +141,7 @@ const LineupLock = () => {
       if (!awayInitials.trim()) throw new Error("Initiales requises");
       if (approval) {
         if (approval.away_signed_at) throw new Error("Déjà signé");
-        const updates: Record<string, unknown> = {
+        const updates: { away_coach_initials: string; away_signed_at: string; updated_at: string; locked?: boolean; locked_at?: string } = {
           away_coach_initials: awayInitials.toUpperCase(),
           away_signed_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),

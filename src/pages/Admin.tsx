@@ -387,7 +387,7 @@ const MatchesTab = () => {
           throw new Error("L'alignement doit être verrouillé avant de passer en direct");
         }
       }
-      const update: Record<string, unknown> = { status, is_live: status === "live" };
+      const update: { status: string; is_live: boolean; lineup_confirmed?: boolean } = { status, is_live: status === "live" };
       if (status === "live") update.lineup_confirmed = true;
       const { error } = await supabase.from("matches").update(update).eq("id", id);
       if (error) throw error;
