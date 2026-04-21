@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+import TeamLogo from "@/components/TeamLogo";
 
 type Player = Tables<"players">;
 type Team = Tables<"teams">;
@@ -46,12 +47,14 @@ const TeamDetail = () => {
             </Link>
             <div className="flex items-center gap-3">
               {team && (
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2"
-                  style={{ borderColor: team.color, color: team.color }}
-                >
-                  {team.abbr}
-                </div>
+                <TeamLogo
+                  logoUrl={team.logo_url}
+                  abbr={team.abbr}
+                  color={team.color}
+                  name={team.name}
+                  className="w-10 h-10 rounded-full"
+                  textClassName="text-sm"
+                />
               )}
               <h1 className="font-display text-4xl font-bold text-neon">{team?.name || "..."}</h1>
             </div>

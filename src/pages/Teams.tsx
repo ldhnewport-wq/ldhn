@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Users, ChevronRight } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+import TeamLogo from "@/components/TeamLogo";
 
 type Team = Tables<"teams">;
 
@@ -75,12 +76,14 @@ const Teams = () => {
               <Card key={team.id} className="bg-card border-border hover:border-primary/30 transition-colors">
                 <CardHeader className="flex flex-row items-center pb-2">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2"
-                      style={{ borderColor: team.color, color: team.color }}
-                    >
-                      {team.abbr}
-                    </div>
+                    <TeamLogo
+                      logoUrl={team.logo_url}
+                      abbr={team.abbr}
+                      color={team.color}
+                      name={team.name}
+                      className="w-10 h-10 rounded-full"
+                      textClassName="text-sm"
+                    />
                     <CardTitle className="text-lg">{team.name}</CardTitle>
                   </div>
                 </CardHeader>
