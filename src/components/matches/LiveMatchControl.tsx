@@ -74,7 +74,9 @@ const LiveMatchControl = ({ match }: LiveMatchControlProps) => {
     mutationFn: async ({ field, delta }: { field: "home_score" | "away_score"; delta: number }) => {
       const currentVal = field === "home_score" ? match.home_score : match.away_score;
       const newVal = Math.max(0, currentVal + delta);
-      const { error } = await supabase.from("matches").update({ [field]: newVal, period: selectedPeriod }).eq("id", match.id);
+      const updateData: { home_score?: number; away_score?: number; period: string } = 
+        field === "home_score" ? { home_score: newVal, period: selectedPeriod } : { away_score: newVal, period: selectedPeriod };
+      const { error } = await supabase.from("matches").update(updateData).eq("id", match.id);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["matches"] }),
