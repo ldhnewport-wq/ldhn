@@ -41,7 +41,7 @@ const Classement = () => {
       const { data, error } = await supabase
         .from("match_events")
         .select("*, players!match_events_player_id_fkey(first_name, last_name, team_id)")
-        .in("event_type", ["goal", "assist"]);
+        .eq("event_type", "goal");
       if (error) throw error;
       return data;
     },
@@ -84,7 +84,7 @@ const Classement = () => {
     return divPlayers
       .map((player) => {
         const goals = (events ?? []).filter((e) => e.event_type === "goal" && e.player_id === player.id).length;
-        const assists = (events ?? []).filter((e) => e.event_type === "assist" && e.player_id === player.id).length;
+        const assists = (events ?? []).filter((e) => e.event_type === "goal" && e.assist_player_id === player.id).length;
         return { player, goals, assists, pts: goals + (assists * 2) };
       })
       .filter((p) => p.pts > 0)
