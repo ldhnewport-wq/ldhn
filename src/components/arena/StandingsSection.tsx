@@ -8,6 +8,7 @@ interface TeamData {
   name: string;
   abbr: string;
   color: string;
+  logo_url?: string | null;
 }
 
 interface MatchData {
@@ -75,10 +76,14 @@ const StandingsSection = () => {
               <span className="w-10 font-bold text-xl text-muted-foreground">{i + 1}</span>
               <div className="flex items-center gap-3 text-left pl-4">
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border overflow-hidden bg-arena-surface"
                   style={{ borderColor: s.team.color, color: s.team.color }}
                 >
-                  {s.team.abbr}
+                  {s.team.logo_url ? (
+                    <img src={s.team.logo_url} alt={s.team.name} className="w-full h-full object-contain p-0.5" />
+                  ) : (
+                    s.team.abbr
+                  )}
                 </div>
                 <span className="text-lg font-semibold text-foreground">{s.team.name}</span>
               </div>

@@ -5,6 +5,7 @@ interface TeamData {
   name: string;
   abbr: string;
   color: string;
+  logo_url?: string | null;
 }
 
 interface TodayMatch {
@@ -24,7 +25,7 @@ const TodayScheduleBar = () => {
 
       const { data, error } = await supabase
         .from("matches")
-        .select("id, match_date, home_team:teams!matches_home_team_id_fkey(name, abbr, color), away_team:teams!matches_away_team_id_fkey(name, abbr, color)")
+        .select("id, match_date, home_team:teams!matches_home_team_id_fkey(name, abbr, color, logo_url), away_team:teams!matches_away_team_id_fkey(name, abbr, color, logo_url)")
         .gte("match_date", startOfDay)
         .lt("match_date", endOfDay)
         .order("match_date", { ascending: true });
@@ -63,19 +64,27 @@ const TodayScheduleBar = () => {
               {formatTime(match.match_date)}
             </span>
             <div className="flex items-center gap-1 flex-1 min-w-0">
-              <span
-                className="font-display text-sm font-bold truncate"
-                style={{ color: match.home_team?.color }}
-              >
-                {match.home_team?.abbr}
-              </span>
+              {match.home_team?.logo_url ? (
+                <img src={match.home_team.logo_url} alt={match.home_team.abbr} className="w-6 h-6 object-contain" />
+              ) : (
+                <span
+                  className="font-display text-sm font-bold truncate"
+                  style={{ color: match.home_team?.color }}
+                >
+                  {match.home_team?.abbr}
+                </span>
+              )}
               <span className="text-xs text-muted-foreground">vs</span>
-              <span
-                className="font-display text-sm font-bold truncate"
-                style={{ color: match.away_team?.color }}
-              >
-                {match.away_team?.abbr}
-              </span>
+              {match.away_team?.logo_url ? (
+                <img src={match.away_team.logo_url} alt={match.away_team.abbr} className="w-6 h-6 object-contain" />
+              ) : (
+                <span
+                  className="font-display text-sm font-bold truncate"
+                  style={{ color: match.away_team?.color }}
+                >
+                  {match.away_team?.abbr}
+                </span>
+              )}
             </div>
             <span className="text-xs font-bold text-muted-foreground bg-background rounded px-1.5 py-0.5">
               V{idx + 1}
