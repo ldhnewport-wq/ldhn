@@ -10,6 +10,7 @@ interface TeamData {
   name: string;
   abbr: string;
   color: string;
+  logo_url?: string | null;
 }
 
 interface MatchData {
@@ -49,12 +50,16 @@ const ScoreCard = ({ match, isLive }: { match: MatchData; isLive: boolean }) => 
     <div className="flex items-center justify-center gap-8 mt-8">
       <div className="flex flex-col items-center gap-3">
         <motion.div
-          className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-display font-bold border-2"
+          className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-display font-bold border-2 overflow-hidden bg-arena-surface"
           style={{ borderColor: match.home_team.color, color: match.home_team.color }}
           animate={isLive ? { boxShadow: [`0 0 10px ${match.home_team.color}40`, `0 0 25px ${match.home_team.color}60`, `0 0 10px ${match.home_team.color}40`] } : {}}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          {match.home_team.abbr}
+          {match.home_team.logo_url ? (
+            <img src={match.home_team.logo_url} alt={match.home_team.name} className="w-full h-full object-contain p-1" />
+          ) : (
+            match.home_team.abbr
+          )}
         </motion.div>
         <span className="text-sm text-muted-foreground font-display tracking-wider">{match.home_team.name}</span>
       </div>
@@ -65,12 +70,16 @@ const ScoreCard = ({ match, isLive }: { match: MatchData; isLive: boolean }) => 
       </div>
       <div className="flex flex-col items-center gap-3">
         <motion.div
-          className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-display font-bold border-2"
+          className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-display font-bold border-2 overflow-hidden bg-arena-surface"
           style={{ borderColor: match.away_team.color, color: match.away_team.color }}
           animate={isLive ? { boxShadow: [`0 0 10px ${match.away_team.color}40`, `0 0 25px ${match.away_team.color}60`, `0 0 10px ${match.away_team.color}40`] } : {}}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          {match.away_team.abbr}
+          {match.away_team.logo_url ? (
+            <img src={match.away_team.logo_url} alt={match.away_team.name} className="w-full h-full object-contain p-1" />
+          ) : (
+            match.away_team.abbr
+          )}
         </motion.div>
         <span className="text-sm text-muted-foreground font-display tracking-wider">{match.away_team.name}</span>
       </div>
