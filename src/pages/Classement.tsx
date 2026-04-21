@@ -36,17 +36,19 @@ const Classement = () => {
   });
 
   const { data: events } = useQuery({
-    queryKey: ["match-events-goals-v2"],
+    queryKey: ["match-events-all-v3"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("match_events")
-        .select("id, event_type, player_id, assist_player_id, match_id, team_id")
-        .eq("event_type", "goal");
+        .select("id, event_type, player_id, assist_player_id, match_id, team_id");
       if (error) throw error;
+      console.log("[Classement] events loaded:", data?.length, "with assists:", data?.filter((e: any) => e.assist_player_id).length);
       return data;
     },
     staleTime: 0,
+    gcTime: 0,
     refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   });
 
   const { data: players } = useQuery({
