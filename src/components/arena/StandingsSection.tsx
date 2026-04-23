@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import SectionTitle from "./SectionTitle";
+import TeamLogo from "@/components/TeamLogo";
 
 interface TeamData {
   id: string;
@@ -75,16 +76,14 @@ const StandingsSection = () => {
             >
               <span className="w-10 font-bold text-xl text-muted-foreground">{i + 1}</span>
               <div className="flex items-center gap-3 text-left pl-4">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border overflow-hidden bg-arena-surface"
-                  style={{ borderColor: s.team.color, color: s.team.color }}
-                >
-                  {s.team.logo_url ? (
-                    <img src={s.team.logo_url} alt={s.team.name} className="w-full h-full object-contain p-0.5" />
-                  ) : (
-                    s.team.abbr
-                  )}
-                </div>
+                <TeamLogo
+                  logoUrl={s.team.logo_url}
+                  abbr={s.team.abbr}
+                  color={s.team.color}
+                  name={s.team.name}
+                  className="w-10 h-10 rounded-full"
+                  textClassName="text-xs"
+                />
                 <span className="text-lg font-semibold text-foreground">{s.team.name}</span>
               </div>
               <span className="text-lg text-secondary-foreground">{s.gp}</span>
