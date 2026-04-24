@@ -21,7 +21,7 @@ const Index = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
       >
-        <img src={ldhnLogo} alt="LDHN" className="w-40 h-40 mb-8 border-double border-primary rounded-3xl border-8 shadow-none opacity-100 object-contain px-0 mx-[156px] text-center font-extralight" />
+        <img src={ldhnLogo} alt="LDHN" className="w-40 h-40 mb-8 border-double border-primary rounded-3xl border-8 shadow-none opacity-100 object-contain px-0 font-extralight mx-0 text-justify" />
         <h1 className="font-display text-5xl md:text-7xl font-bold tracking-wider text-neon mb-2">
           LDHN
         </h1>
