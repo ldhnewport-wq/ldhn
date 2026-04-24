@@ -16,17 +16,15 @@ const TeamLogo = ({ logoUrl, abbr, color, name, className = "", textClassName = 
   if (logoUrl) {
     return (
       <div
-        className={`flex items-center justify-center overflow-hidden bg-white shadow-lg ring-2 ring-offset-2 ring-offset-background ${className}`}
+        className={`flex items-center justify-center overflow-hidden bg-black shadow-lg ${className}`}
         style={{
-          // @ts-expect-error CSS var
-          "--tw-ring-color": color,
-          boxShadow: `0 4px 14px ${color}66, 0 0 0 1px ${color}`,
+          boxShadow: `0 4px 14px ${color}66, 0 0 0 2px ${color}`,
         }}
       >
         <img
           src={logoUrl}
           alt={name || abbr}
-          className="w-[88%] h-[88%] object-contain"
+          className="w-[115%] h-[115%] object-contain"
           loading="lazy"
         />
       </div>
