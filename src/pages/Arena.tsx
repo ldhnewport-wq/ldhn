@@ -15,7 +15,6 @@ const ALL_SECTIONS = [
   { component: LiveScoresSection, name: "Scores" },
   { component: StandingsSection, name: "Classement" },
   { component: TopPlayersSection, name: "Meneurs" },
-  { component: PlayerOfTheMatchSection, name: "MVP" },
   { component: HighlightsSection, name: "Faits saillants" },
   { component: ReportageSection, name: "Reportage" },
 ];
