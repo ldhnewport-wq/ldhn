@@ -81,8 +81,8 @@ const Teams = () => {
                       abbr={team.abbr}
                       color={team.color}
                       name={team.name}
-                      className="w-10 h-10 rounded-full"
-                      textClassName="text-sm"
+                      className="w-16 h-16 rounded-full shrink-0"
+                      textClassName="text-base"
                     />
                     <CardTitle className="text-lg">{team.name}</CardTitle>
                   </div>
