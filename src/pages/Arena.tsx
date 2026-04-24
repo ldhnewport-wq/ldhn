@@ -4,7 +4,7 @@ import ArenaHeader from "@/components/arena/ArenaHeader";
 import LiveScoresSection from "@/components/arena/LiveScoresSection";
 import StandingsSection from "@/components/arena/StandingsSection";
 import TopPlayersSection from "@/components/arena/TopPlayersSection";
-import PlayerOfTheMatchSection from "@/components/arena/PlayerOfTheMatchSection";
+
 import HighlightsSection from "@/components/arena/HighlightsSection";
 import ReportageSection from "@/components/arena/ReportageSection";
 import ProgressBar from "@/components/arena/ProgressBar";
@@ -15,7 +15,6 @@ const ALL_SECTIONS = [
   { component: LiveScoresSection, name: "Scores" },
   { component: StandingsSection, name: "Classement" },
   { component: TopPlayersSection, name: "Meneurs" },
-  { component: PlayerOfTheMatchSection, name: "MVP" },
   { component: HighlightsSection, name: "Faits saillants" },
   { component: ReportageSection, name: "Reportage" },
 ];
