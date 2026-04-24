@@ -135,7 +135,7 @@ const TopPlayersSection = () => {
   const teamMap = new Map((teams ?? []).map((t) => [t.id, t]));
   const goalEvents = (events ?? []).filter((e) => e.event_type === "goal");
 
-  const ranked: RankedPlayer[] = (players ?? [])
+  const ranked = (players ?? [])
     .filter((p) => p.position !== "G")
     .map((p) => {
       const team = teamMap.get(p.team_id);
@@ -145,13 +145,13 @@ const TopPlayersSection = () => {
         id: p.id,
         fullName: `${p.first_name.trim()} ${p.last_name.trim()}`,
         number: p.number,
-        team: team!,
+        team: team as TeamRow,
         goals,
         assists,
         pts: goals + assists * 2,
       };
     })
-    .filter((p) => p.team) as any;
+    .filter((p) => !!p.team);
 
   const topScorers = [...ranked]
     .map((p) => ({ ...p, value: p.goals }))
