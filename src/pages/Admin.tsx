@@ -923,18 +923,20 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="teams" className="space-y-4">
-          <TabsList className="grid grid-cols-5 w-full bg-secondary/50">
+          <TabsList className="grid grid-cols-6 w-full bg-secondary/50">
             <TabsTrigger value="teams" className="gap-1 text-xs sm:text-sm"><Users className="h-4 w-4 hidden sm:block" /> Équipes</TabsTrigger>
             <TabsTrigger value="players" className="gap-1 text-xs sm:text-sm"><Trophy className="h-4 w-4 hidden sm:block" /> Joueurs</TabsTrigger>
             <TabsTrigger value="matches" className="gap-1 text-xs sm:text-sm"><Gamepad2 className="h-4 w-4 hidden sm:block" /> Matchs</TabsTrigger>
             <TabsTrigger value="lineup" className="gap-1 text-xs sm:text-sm"><Zap className="h-4 w-4 hidden sm:block" /> Alignement</TabsTrigger>
             <TabsTrigger value="articles" className="gap-1 text-xs sm:text-sm"><Newspaper className="h-4 w-4 hidden sm:block" /> Reportage</TabsTrigger>
+            <TabsTrigger value="tournament" className="gap-1 text-xs sm:text-sm"><Sparkles className="h-4 w-4 hidden sm:block" /> Tournoi</TabsTrigger>
           </TabsList>
           <TabsContent value="teams"><TeamsTab /></TabsContent>
           <TabsContent value="players"><PlayersTab /></TabsContent>
           <TabsContent value="matches"><MatchesTab /></TabsContent>
           <TabsContent value="lineup"><LineupTab /></TabsContent>
           <TabsContent value="articles"><ArticlesTab /></TabsContent>
+          <TabsContent value="tournament"><TournamentTab /></TabsContent>
         </Tabs>
       </div>
     </div>
