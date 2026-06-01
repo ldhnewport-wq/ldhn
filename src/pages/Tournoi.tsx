@@ -12,8 +12,8 @@ const EDITION = "2026";
 
 const categoryLabels: Record<string, string> = {
   rookies: "Rookies",
-  intermediaire: "Intermédiaire",
-  elite: "Élite",
+  intermediaire: "Les Young Guns",
+  elite: "Les vétérans",
 };
 
 const Tournoi = () => {

@@ -9,8 +9,8 @@ const EDITION = "2026";
 const CATEGORIES = [
   { key: "all", label: "Toutes" },
   { key: "rookies", label: "Rookies" },
-  { key: "intermediaire", label: "Intermédiaire" },
-  { key: "elite", label: "Élite" },
+  { key: "intermediaire", label: "Les Young Guns" },
+  { key: "elite", label: "Les vétérans" },
 ];
 
 const TournoiHoraire = () => {
