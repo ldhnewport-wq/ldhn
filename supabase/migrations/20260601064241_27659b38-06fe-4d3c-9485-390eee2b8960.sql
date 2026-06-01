@@ -1,0 +1,1 @@
+ALTER TABLE public.tournament_schedule ADD COLUMN IF NOT EXISTS overtime boolean NOT NULL DEFAULT false;

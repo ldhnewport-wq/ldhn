@@ -444,6 +444,7 @@ export type Database = {
           home_team_id: string | null
           id: string
           match_date: string
+          overtime: boolean
           round: string | null
           status: string
           venue: string | null
@@ -460,6 +461,7 @@ export type Database = {
           home_team_id?: string | null
           id?: string
           match_date: string
+          overtime?: boolean
           round?: string | null
           status?: string
           venue?: string | null
@@ -476,6 +478,7 @@ export type Database = {
           home_team_id?: string | null
           id?: string
           match_date?: string
+          overtime?: boolean
           round?: string | null
           status?: string
           venue?: string | null
