@@ -334,6 +334,156 @@ export type Database = {
         }
         Relationships: []
       }
+      tournament_bracket: {
+        Row: {
+          away_label: string | null
+          away_score: number | null
+          away_team_id: string | null
+          category: string
+          created_at: string
+          edition: string
+          home_label: string | null
+          home_score: number | null
+          home_team_id: string | null
+          id: string
+          position: number
+          round: string
+          winner_team_id: string | null
+        }
+        Insert: {
+          away_label?: string | null
+          away_score?: number | null
+          away_team_id?: string | null
+          category?: string
+          created_at?: string
+          edition?: string
+          home_label?: string | null
+          home_score?: number | null
+          home_team_id?: string | null
+          id?: string
+          position?: number
+          round: string
+          winner_team_id?: string | null
+        }
+        Update: {
+          away_label?: string | null
+          away_score?: number | null
+          away_team_id?: string | null
+          category?: string
+          created_at?: string
+          edition?: string
+          home_label?: string | null
+          home_score?: number | null
+          home_team_id?: string | null
+          id?: string
+          position?: number
+          round?: string
+          winner_team_id?: string | null
+        }
+        Relationships: []
+      }
+      tournament_content: {
+        Row: {
+          body: string | null
+          edition: string
+          id: string
+          section: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          edition?: string
+          id?: string
+          section: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          edition?: string
+          id?: string
+          section?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tournament_schedule: {
+        Row: {
+          away_label: string | null
+          away_score: number | null
+          away_team_id: string | null
+          category: string
+          created_at: string
+          edition: string
+          home_label: string | null
+          home_score: number | null
+          home_team_id: string | null
+          id: string
+          match_date: string
+          round: string | null
+          status: string
+          venue: string | null
+        }
+        Insert: {
+          away_label?: string | null
+          away_score?: number | null
+          away_team_id?: string | null
+          category?: string
+          created_at?: string
+          edition?: string
+          home_label?: string | null
+          home_score?: number | null
+          home_team_id?: string | null
+          id?: string
+          match_date: string
+          round?: string | null
+          status?: string
+          venue?: string | null
+        }
+        Update: {
+          away_label?: string | null
+          away_score?: number | null
+          away_team_id?: string | null
+          category?: string
+          created_at?: string
+          edition?: string
+          home_label?: string | null
+          home_score?: number | null
+          home_team_id?: string | null
+          id?: string
+          match_date?: string
+          round?: string | null
+          status?: string
+          venue?: string | null
+        }
+        Relationships: []
+      }
+      tournament_teams: {
+        Row: {
+          category: string
+          created_at: string
+          edition: string
+          id: string
+          team_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          edition?: string
+          id?: string
+          team_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          edition?: string
+          id?: string
+          team_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -12,6 +12,10 @@ import Classement from "./pages/Classement.tsx";
 import Admin from "./pages/Admin.tsx";
 import Reportage from "./pages/Reportage.tsx";
 import LineupLock from "./pages/LineupLock.tsx";
+import Tournoi from "./pages/Tournoi.tsx";
+import TournoiHoraire from "./pages/TournoiHoraire.tsx";
+import TournoiTableau from "./pages/TournoiTableau.tsx";
+import TournoiContent from "./pages/TournoiContent.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -31,6 +35,11 @@ const App = () => (
           <Route path="/classement" element={<Classement />} />
           <Route path="/reportage" element={<Reportage />} />
           <Route path="/lineup/:matchId" element={<LineupLock />} />
+          <Route path="/tournoi" element={<Tournoi />} />
+          <Route path="/tournoi/horaire" element={<TournoiHoraire />} />
+          <Route path="/tournoi/tableau" element={<TournoiTableau />} />
+          <Route path="/tournoi/reglements" element={<TournoiContent section="reglements" />} />
+          <Route path="/tournoi/remerciements" element={<TournoiContent section="remerciements" />} />
           <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

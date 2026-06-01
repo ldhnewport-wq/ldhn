@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import ldhnLogo from "@/assets/logo-new.png";
-import { Users, Swords, Trophy, Monitor, Settings, Newspaper } from "lucide-react";
+import { Users, Swords, Trophy, Monitor, Settings, Newspaper, Sparkles } from "lucide-react";
 
 const navItems = [
   { to: "/equipes", icon: Users, label: "Équipes", desc: "Voir les équipes et alignements" },
@@ -28,6 +28,27 @@ const Index = () => {
         <p className="text-lg text-muted-foreground tracking-[0.3em] uppercase mb-12">
           Ligue de Dek Hockey Newport
         </p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-8 max-w-lg mx-auto"
+        >
+          <Link
+            to="/tournoi"
+            className="flex items-center justify-center gap-3 bg-primary/10 border-2 border-primary rounded-xl p-5 transition-all hover:scale-105 hover:glow-neon"
+          >
+            <Sparkles className="h-7 w-7 text-primary" />
+            <div className="text-left">
+              <div className="font-display text-xl font-bold tracking-wider uppercase text-neon">
+                Tournoi 3<sup>e</sup> édition 2026
+              </div>
+              <div className="text-xs text-muted-foreground">Équipes, horaire, bracket, règlements</div>
+            </div>
+          </Link>
+        </motion.div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
           {navItems.map((item, i) => (
             <motion.div
