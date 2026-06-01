@@ -15,8 +15,8 @@ import { Plus, Trash2, Save } from "lucide-react";
 const EDITION = "2026";
 const CATEGORIES = [
   { value: "rookies", label: "Rookies" },
-  { value: "intermediaire", label: "Intermédiaire" },
-  { value: "elite", label: "Élite" },
+  { value: "intermediaire", label: "Les Young Guns" },
+  { value: "elite", label: "Les vétérans" },
 ];
 
 const TournamentTab = () => {
