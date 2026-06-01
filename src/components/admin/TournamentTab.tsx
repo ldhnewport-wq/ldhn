@@ -304,7 +304,21 @@ const TournamentSchedule = () => {
       const { error } = await supabase.from("tournament_schedule").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["tournament_schedule", EDITION] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["tournament_schedule", EDITION] });
+      qc.invalidateQueries({ queryKey: ["tournament_schedule_completed", EDITION] });
+    },
+  });
+
+  const updateMatch = useMutation({
+    mutationFn: async ({ id, patch }: { id: string; patch: any }) => {
+      const { error } = await supabase.from("tournament_schedule").update(patch).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["tournament_schedule", EDITION] });
+      qc.invalidateQueries({ queryKey: ["tournament_schedule_completed", EDITION] });
+    },
   });
 
   return (
@@ -354,18 +368,52 @@ const TournamentSchedule = () => {
         <div className="space-y-2">
           {schedule?.map((m: any) => (
             <Card key={m.id}>
-              <CardContent className="p-3 flex items-center justify-between gap-3">
-                <div className="text-sm">
-                  <div className="text-xs text-muted-foreground uppercase">
-                    {new Date(m.match_date).toLocaleString("fr-CA", { dateStyle: "short", timeStyle: "short" })}
-                    {m.venue ? ` · ${m.venue}` : ""} · {CATEGORIES.find(c => c.value === m.category)?.label}
-                    {m.round ? ` · ${m.round}` : ""}
+              <CardContent className="p-3 space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-sm">
+                    <div className="text-xs text-muted-foreground uppercase">
+                      {new Date(m.match_date).toLocaleString("fr-CA", { dateStyle: "short", timeStyle: "short" })}
+                      {m.venue ? ` · ${m.venue}` : ""} · {CATEGORIES.find(c => c.value === m.category)?.label}
+                      {m.round ? ` · ${m.round}` : ""}
+                    </div>
+                    <div>{m.home?.name ?? "TBD"} vs {m.away?.name ?? "TBD"}</div>
                   </div>
-                  <div>{m.home?.name ?? "TBD"} vs {m.away?.name ?? "TBD"}</div>
+                  <Button variant="ghost" size="icon" onClick={() => remove.mutate(m.id)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => remove.mutate(m.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                <div className="flex items-center gap-2 flex-wrap pt-1 border-t">
+                  <span className="text-xs text-muted-foreground">Pointage:</span>
+                  <Input
+                    type="number"
+                    defaultValue={m.home_score ?? ""}
+                    className="w-16 h-8"
+                    placeholder="loc"
+                    onBlur={(e) => {
+                      const v = e.target.value === "" ? null : parseInt(e.target.value);
+                      if (v !== m.home_score) updateMatch.mutate({ id: m.id, patch: { home_score: v, status: v != null && m.away_score != null ? "completed" : m.status } });
+                    }}
+                  />
+                  <span>:</span>
+                  <Input
+                    type="number"
+                    defaultValue={m.away_score ?? ""}
+                    className="w-16 h-8"
+                    placeholder="vis"
+                    onBlur={(e) => {
+                      const v = e.target.value === "" ? null : parseInt(e.target.value);
+                      if (v !== m.away_score) updateMatch.mutate({ id: m.id, patch: { away_score: v, status: v != null && m.home_score != null ? "completed" : m.status } });
+                    }}
+                  />
+                  <label className="flex items-center gap-1 text-xs ml-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      defaultChecked={!!m.overtime}
+                      onChange={(e) => updateMatch.mutate({ id: m.id, patch: { overtime: e.target.checked } })}
+                    />
+                    Prolongation
+                  </label>
+                </div>
               </CardContent>
             </Card>
           ))}
