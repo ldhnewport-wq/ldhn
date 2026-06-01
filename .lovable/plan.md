@@ -1,62 +1,53 @@
+# Tournoi 3e édition 2026
 
+## Objectif
+Ajouter un nouvel onglet principal "Tournoi 3e édition 2026" accessible depuis la page d'accueil et offrant un espace dédié au tournoi annuel.
 
-## Diagnostic
+## Structure de la page `/tournoi`
 
-Les passes sont bien en base (12 passes, 28 buts, 2 matchs finals) et le code les calcule correctement avec la formule `pts = buts + (passes × 2)`. Le vrai problème : la page `/classement` affiche d'abord un menu de boutons, donc tant qu'on n'a pas cliqué sur "Classements des marqueurs", on ne voit aucune statistique — d'où l'impression que "rien ne s'affiche".
+Hub central avec :
+- **En-tête** : Titre "Tournoi 3e édition 2026" + logo LDHN
+- **Équipes inscrites** : grille des équipes participantes avec logos/couleurs, cliquables pour voir l'alignement (réutilisation du composant existant des équipes)
+- **6 boutons d'accès rapide** :
+  1. Horaire général
+  2. Horaire par catégorie (Rookies / Intermédiaire / Élite)
+  3. Tableau du tournoi (bracket)
+  4. Règlements
+  5. Remerciements (commanditaires/bénévoles)
+  6. Retour accueil
 
-## Plan
+## Données
 
-### 1. Onglets en haut de page (au lieu du menu)
-Remplacer le menu d'accueil par 3 onglets toujours visibles :
-- **Marqueurs** (actif par défaut) → buts, passes, points
-- **Gardiens** → stats des gardiens
-- **Équipes** → classement des équipes
+Nouvelle table `tournament_teams` (référence vers `teams` existantes) pour marquer quelles équipes sont inscrites au tournoi 2026, avec une catégorie (rookies/intermédiaire/élite).
 
-L'onglet Marqueurs étant ouvert dès l'arrivée, les passes seront immédiatement visibles.
+Les **alignements sont transférés automatiquement** depuis la table `players` existante (jointure par `team_id`) — pas de duplication des joueurs.
 
-### 2. Distinction claire entre les 3 divisions
-Dans **chaque onglet**, afficher les 3 divisions les unes sous les autres avec une séparation visuelle nette :
+Nouvelles tables :
+- `tournament_schedule` : matchs du tournoi (date, heure, équipes, catégorie, terrain)
+- `tournament_bracket` : positions dans le tableau éliminatoire
+- `tournament_content` : contenu éditable pour Règlements et Remerciements (sections markdown)
 
-```text
-┌──────────────────────────────────────┐
-│ [Marqueurs] [Gardiens] [Équipes]     │
-├──────────────────────────────────────┤
-│ ▌ Division Les Rookies               │  ← bandeau coloré
-│   ┌──────────────────────────────┐  │
-│   │ tableau des marqueurs Rookies│  │
-│   └──────────────────────────────┘  │
-│                                      │
-│ ▌ Division Les Young Guns            │  ← bandeau coloré
-│   ┌──────────────────────────────┐  │
-│   │ tableau des marqueurs YG     │  │
-│   └──────────────────────────────┘  │
-│                                      │
-│ ▌ Division Les Vétérans              │  ← bandeau coloré
-│   ┌──────────────────────────────┐  │
-│   │ tableau des marqueurs Vét.   │  │
-│   └──────────────────────────────┘  │
-└──────────────────────────────────────┘
-```
+## Sous-pages
 
-Chaque section de division aura :
-- Un **en-tête de division** distinctif (titre large, barre verticale colorée à gauche, espacement marqué)
-- Son **propre tableau** (marqueurs, gardiens ou équipes selon l'onglet)
-- Un **séparateur visuel** entre divisions (ligne ou large espace)
-- Plus besoin du sous-menu "choisir une division" pour les équipes — les 3 sont visibles directement
+- `/tournoi` — hub principal
+- `/tournoi/horaire` — horaire (filtres par catégorie)
+- `/tournoi/tableau` — bracket visuel
+- `/tournoi/reglements` — texte des règlements
+- `/tournoi/remerciements` — page de remerciements
+- `/tournoi/equipe/:id` — détail d'une équipe inscrite (réutilise TeamDetail)
 
-### 3. Logo de l'équipe à côté du joueur
-Dans les tableaux Marqueurs et Gardiens, ajouter une mini-pastille avec le logo (ou abréviation colorée) de l'équipe du joueur, en cohérence avec le reste du site.
+## Admin
 
-### 4. Nettoyage technique
-Retirer la config cache agressive (`staleTime: 0`, `gcTime: 0`, `refetchOnMount: "always"`) qui n'est plus nécessaire — le problème n'était pas le cache.
+Extension de `/admin` avec un nouvel onglet "Tournoi" pour :
+- Inscrire/désinscrire des équipes
+- Gérer l'horaire
+- Éditer le bracket
+- Éditer règlements et remerciements
 
-## Détails techniques
+## Étapes techniques
 
-**Fichier modifié** : `src/pages/Classement.tsx`
-- Remplacer le state `view` par un state `tab: "scorers" | "goalies" | "teams"` (défaut: `"scorers"`).
-- Utiliser le composant `<Tabs>` shadcn (déjà disponible).
-- Composant local `<DivisionSection>` réutilisable rendant l'en-tête de division + le tableau passé en enfant.
-- Importer `<TeamLogo>` (déjà existant) pour les colonnes équipe.
-- Restaurer la config par défaut sur la query `events`.
-- Supprimer les états `selectedDivision` et la vue `teams-division`.
-
+1. Migration SQL : créer les 3 nouvelles tables avec RLS publique en lecture
+2. Créer la page `/tournoi` (Index du tournoi)
+3. Créer les sous-pages Horaire, Bracket, Règlements, Remerciements
+4. Ajouter la carte/bouton sur la page d'accueil (en haut, mis en valeur)
+5. Ajouter la gestion admin
