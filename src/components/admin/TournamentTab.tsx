@@ -22,17 +22,129 @@ const CATEGORIES = [
 const TournamentTab = () => {
   return (
     <Tabs defaultValue="teams" className="space-y-4">
-      <TabsList className="grid grid-cols-4 w-full bg-secondary/50">
+      <TabsList className="grid grid-cols-5 w-full bg-secondary/50">
         <TabsTrigger value="teams" className="text-xs sm:text-sm">Équipes</TabsTrigger>
         <TabsTrigger value="schedule" className="text-xs sm:text-sm">Horaire</TabsTrigger>
+        <TabsTrigger value="standings" className="text-xs sm:text-sm">Classement</TabsTrigger>
         <TabsTrigger value="bracket" className="text-xs sm:text-sm">Tableau</TabsTrigger>
         <TabsTrigger value="content" className="text-xs sm:text-sm">Textes</TabsTrigger>
       </TabsList>
       <TabsContent value="teams"><TournamentTeams /></TabsContent>
       <TabsContent value="schedule"><TournamentSchedule /></TabsContent>
+      <TabsContent value="standings"><TournamentStandings /></TabsContent>
       <TabsContent value="bracket"><TournamentBracket /></TabsContent>
       <TabsContent value="content"><TournamentContent /></TabsContent>
     </Tabs>
+  );
+};
+
+// ─── Standings ─────────────────────────────────────
+const TournamentStandings = () => {
+  const { data: registered } = useQuery({
+    queryKey: ["tournament_teams", EDITION],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tournament_teams")
+        .select("category, team_id, teams:team_id(name, abbr, color)")
+        .eq("edition", EDITION);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const { data: schedule } = useQuery({
+    queryKey: ["tournament_schedule_completed", EDITION],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tournament_schedule")
+        .select("*")
+        .eq("edition", EDITION);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const standingsByCategory: Record<string, any[]> = {};
+  CATEGORIES.forEach((c) => (standingsByCategory[c.value] = []));
+
+  (registered ?? []).forEach((r: any) => {
+    standingsByCategory[r.category]?.push({
+      team_id: r.team_id,
+      name: r.teams?.name ?? "—",
+      color: r.teams?.color,
+      gp: 0, w: 0, l: 0, otl: 0, gf: 0, ga: 0, pts: 0,
+    });
+  });
+
+  (schedule ?? []).forEach((m: any) => {
+    if (m.home_score == null || m.away_score == null) return;
+    const cat = standingsByCategory[m.category];
+    if (!cat) return;
+    const home = cat.find((t: any) => t.team_id === m.home_team_id);
+    const away = cat.find((t: any) => t.team_id === m.away_team_id);
+    if (home) { home.gp++; home.gf += m.home_score; home.ga += m.away_score; }
+    if (away) { away.gp++; away.gf += m.away_score; away.ga += m.home_score; }
+    if (m.home_score > m.away_score) {
+      if (home) { home.w++; home.pts += 2; }
+      if (away) { if (m.overtime) { away.otl++; away.pts += 1; } else away.l++; }
+    } else if (m.away_score > m.home_score) {
+      if (away) { away.w++; away.pts += 2; }
+      if (home) { if (m.overtime) { home.otl++; home.pts += 1; } else home.l++; }
+    }
+  });
+
+  return (
+    <div className="space-y-6">
+      <p className="text-xs text-muted-foreground">2 pts victoire · 1 pt défaite en prolongation · 0 défaite</p>
+      {CATEGORIES.map((c) => {
+        const rows = [...(standingsByCategory[c.value] ?? [])].sort(
+          (a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf
+        );
+        return (
+          <Card key={c.value}>
+            <CardContent className="p-4">
+              <h3 className="font-display text-lg font-bold mb-3">{c.label}</h3>
+              {rows.length === 0 ? (
+                <p className="text-muted-foreground text-sm">Aucune équipe inscrite</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-xs text-muted-foreground uppercase">
+                        <th className="text-left py-2">Équipe</th>
+                        <th className="text-center px-2">PJ</th>
+                        <th className="text-center px-2">V</th>
+                        <th className="text-center px-2">D</th>
+                        <th className="text-center px-2">DP</th>
+                        <th className="text-center px-2">BP</th>
+                        <th className="text-center px-2">BC</th>
+                        <th className="text-center px-2">+/-</th>
+                        <th className="text-center px-2 font-bold">PTS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((t: any) => (
+                        <tr key={t.team_id} className="border-b last:border-0">
+                          <td className="py-2 font-semibold" style={{ color: t.color }}>{t.name}</td>
+                          <td className="text-center">{t.gp}</td>
+                          <td className="text-center">{t.w}</td>
+                          <td className="text-center">{t.l}</td>
+                          <td className="text-center">{t.otl}</td>
+                          <td className="text-center">{t.gf}</td>
+                          <td className="text-center">{t.ga}</td>
+                          <td className="text-center">{t.gf - t.ga > 0 ? `+${t.gf - t.ga}` : t.gf - t.ga}</td>
+                          <td className="text-center font-bold">{t.pts}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
   );
 };
 
