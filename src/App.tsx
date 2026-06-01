@@ -12,6 +12,10 @@ import Classement from "./pages/Classement.tsx";
 import Admin from "./pages/Admin.tsx";
 import Reportage from "./pages/Reportage.tsx";
 import LineupLock from "./pages/LineupLock.tsx";
+import Tournoi from "./pages/Tournoi.tsx";
+import TournoiHoraire from "./pages/TournoiHoraire.tsx";
+import TournoiTableau from "./pages/TournoiTableau.tsx";
+import TournoiContent from "./pages/TournoiContent.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
