@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import ldhnLogo from "@/assets/logo-new.png";
-import { Users, Swords, Trophy, Monitor, Settings, Newspaper } from "lucide-react";
+import { Users, Swords, Trophy, Monitor, Settings, Newspaper, Sparkles } from "lucide-react";
 
 const navItems = [
   { to: "/equipes", icon: Users, label: "Équipes", desc: "Voir les équipes et alignements" },
