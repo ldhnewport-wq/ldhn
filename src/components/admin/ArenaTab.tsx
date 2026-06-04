@@ -15,6 +15,7 @@ const ALL_SECTIONS = [
   { key: "scores", label: "Scores" },
   { key: "standings", label: "Classement" },
   { key: "top_players", label: "Meneurs" },
+  { key: "tournament", label: "Tournoi (horaire & scores)" },
   { key: "highlights", label: "Faits saillants" },
   { key: "reportage", label: "Reportage" },
   { key: "media", label: "Galerie photos/vidéos" },
