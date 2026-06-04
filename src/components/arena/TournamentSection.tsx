@@ -66,11 +66,11 @@ const TournamentSection = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tournament_schedule")
-        .select("*, home:home_team_id(name, abbr, color, logo_url), away:away_team_id(name, abbr, color, logo_url)")
+        .select("*, home:teams!tournament_schedule_home_team_id_fkey(name, abbr, color, logo_url), away:teams!tournament_schedule_away_team_id_fkey(name, abbr, color, logo_url)")
         .eq("edition", EDITION)
         .order("match_date", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as ScheduleRow[];
+      return (data ?? []) as unknown as ScheduleRow[];
     },
     refetchInterval: 10000,
   });
