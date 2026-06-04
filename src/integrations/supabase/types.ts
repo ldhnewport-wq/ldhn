@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      arena_config: {
+        Row: {
+          enabled_sections: Json
+          id: string
+          live_frequency: number
+          live_mode: string
+          rotation_interval_ms: number
+          updated_at: string
+        }
+        Insert: {
+          enabled_sections?: Json
+          id?: string
+          live_frequency?: number
+          live_mode?: string
+          rotation_interval_ms?: number
+          updated_at?: string
+        }
+        Update: {
+          enabled_sections?: Json
+          id?: string
+          live_frequency?: number
+          live_mode?: string
+          rotation_interval_ms?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      arena_media: {
+        Row: {
+          active: boolean
+          caption: string | null
+          created_at: string
+          duration_ms: number | null
+          id: string
+          media_type: string
+          position: number
+          url: string
+        }
+        Insert: {
+          active?: boolean
+          caption?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          media_type?: string
+          position?: number
+          url: string
+        }
+        Update: {
+          active?: boolean
+          caption?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          media_type?: string
+          position?: number
+          url?: string
+        }
+        Relationships: []
+      }
       articles: {
         Row: {
           category: string
