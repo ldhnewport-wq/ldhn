@@ -11,11 +11,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeMatches } from "@/hooks/useRealtimeMatches";
-import { ArrowLeft, Plus, Trash2, Pencil, Users, Trophy, Gamepad2, Zap, CheckCircle, Newspaper, Upload, LogOut, Lock, Unlock, ExternalLink, History, Sparkles } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Pencil, Users, Trophy, Gamepad2, Zap, CheckCircle, Newspaper, Upload, LogOut, Lock, Unlock, ExternalLink, History, Sparkles, Tv } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import type { Tables } from "@/integrations/supabase/types";
 import LiveMatchControl from "@/components/matches/LiveMatchControl";
 import TournamentTab from "@/components/admin/TournamentTab";
+import ArenaTab from "@/components/admin/ArenaTab";
 import type { Session } from "@supabase/supabase-js";
 
 type Team = Tables<"teams">;
@@ -923,13 +924,14 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="teams" className="space-y-4">
-          <TabsList className="grid grid-cols-6 w-full bg-secondary/50">
+          <TabsList className="grid grid-cols-7 w-full bg-secondary/50">
             <TabsTrigger value="teams" className="gap-1 text-xs sm:text-sm"><Users className="h-4 w-4 hidden sm:block" /> Équipes</TabsTrigger>
             <TabsTrigger value="players" className="gap-1 text-xs sm:text-sm"><Trophy className="h-4 w-4 hidden sm:block" /> Joueurs</TabsTrigger>
             <TabsTrigger value="matches" className="gap-1 text-xs sm:text-sm"><Gamepad2 className="h-4 w-4 hidden sm:block" /> Matchs</TabsTrigger>
             <TabsTrigger value="lineup" className="gap-1 text-xs sm:text-sm"><Zap className="h-4 w-4 hidden sm:block" /> Alignement</TabsTrigger>
             <TabsTrigger value="articles" className="gap-1 text-xs sm:text-sm"><Newspaper className="h-4 w-4 hidden sm:block" /> Reportage</TabsTrigger>
             <TabsTrigger value="tournament" className="gap-1 text-xs sm:text-sm"><Sparkles className="h-4 w-4 hidden sm:block" /> Tournoi</TabsTrigger>
+            <TabsTrigger value="arena" className="gap-1 text-xs sm:text-sm"><Tv className="h-4 w-4 hidden sm:block" /> Aréna</TabsTrigger>
           </TabsList>
           <TabsContent value="teams"><TeamsTab /></TabsContent>
           <TabsContent value="players"><PlayersTab /></TabsContent>
@@ -937,6 +939,7 @@ const Admin = () => {
           <TabsContent value="lineup"><LineupTab /></TabsContent>
           <TabsContent value="articles"><ArticlesTab /></TabsContent>
           <TabsContent value="tournament"><TournamentTab /></TabsContent>
+          <TabsContent value="arena"><ArenaTab /></TabsContent>
         </Tabs>
       </div>
     </div>
