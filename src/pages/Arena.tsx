@@ -28,6 +28,9 @@ const SECTION_MAP = {
   reportage: { component: ReportageSection, name: "Reportage" },
   media: { component: MediaSection, name: "Galerie" },
   tournament: { component: TournamentSection, name: "Tournoi" },
+  tournament_standings_rookies: { component: TournamentStandingsRookies, name: "Classement Rookies" },
+  tournament_standings_young: { component: TournamentStandingsYoungGuns, name: "Classement Young Guns" },
+  tournament_standings_veterans: { component: TournamentStandingsVeterans, name: "Classement Vétérans" },
   live: { component: LiveMatchSection, name: "En direct" },
 } as const;
 
