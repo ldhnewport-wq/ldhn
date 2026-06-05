@@ -11,6 +11,11 @@ import ReportageSection from "@/components/arena/ReportageSection";
 import MediaSection from "@/components/arena/MediaSection";
 import LiveMatchSection from "@/components/arena/LiveMatchSection";
 import TournamentSection from "@/components/arena/TournamentSection";
+import {
+  TournamentStandingsRookies,
+  TournamentStandingsYoungGuns,
+  TournamentStandingsVeterans,
+} from "@/components/arena/TournamentStandingsSections";
 import ProgressBar from "@/components/arena/ProgressBar";
 import ArenaAdminPanel from "@/components/arena/ArenaAdminPanel";
 import TodayScheduleBar from "@/components/arena/TodayScheduleBar";
