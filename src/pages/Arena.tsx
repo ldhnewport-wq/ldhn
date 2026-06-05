@@ -35,7 +35,7 @@ const SECTION_MAP = {
 } as const;
 
 type SectionKey = keyof typeof SECTION_MAP;
-const DEFAULT_KEYS: SectionKey[] = ["scores", "standings", "top_players", "tournament", "highlights", "reportage", "media"];
+const DEFAULT_KEYS: SectionKey[] = ["scores", "standings", "top_players", "tournament", "tournament_standings_rookies", "tournament_standings_young", "tournament_standings_veterans", "highlights", "reportage", "media"];
 
 const Arena = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
