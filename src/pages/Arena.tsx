@@ -11,6 +11,11 @@ import ReportageSection from "@/components/arena/ReportageSection";
 import MediaSection from "@/components/arena/MediaSection";
 import LiveMatchSection from "@/components/arena/LiveMatchSection";
 import TournamentSection from "@/components/arena/TournamentSection";
+import {
+  TournamentStandingsRookies,
+  TournamentStandingsYoungGuns,
+  TournamentStandingsVeterans,
+} from "@/components/arena/TournamentStandingsSections";
 import ProgressBar from "@/components/arena/ProgressBar";
 import ArenaAdminPanel from "@/components/arena/ArenaAdminPanel";
 import TodayScheduleBar from "@/components/arena/TodayScheduleBar";
@@ -23,11 +28,14 @@ const SECTION_MAP = {
   reportage: { component: ReportageSection, name: "Reportage" },
   media: { component: MediaSection, name: "Galerie" },
   tournament: { component: TournamentSection, name: "Tournoi" },
+  tournament_standings_rookies: { component: TournamentStandingsRookies, name: "Classement Rookies" },
+  tournament_standings_young: { component: TournamentStandingsYoungGuns, name: "Classement Young Guns" },
+  tournament_standings_veterans: { component: TournamentStandingsVeterans, name: "Classement Vétérans" },
   live: { component: LiveMatchSection, name: "En direct" },
 } as const;
 
 type SectionKey = keyof typeof SECTION_MAP;
-const DEFAULT_KEYS: SectionKey[] = ["scores", "standings", "top_players", "tournament", "highlights", "reportage", "media"];
+const DEFAULT_KEYS: SectionKey[] = ["scores", "standings", "top_players", "tournament", "tournament_standings_rookies", "tournament_standings_young", "tournament_standings_veterans", "highlights", "reportage", "media"];
 
 const Arena = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
