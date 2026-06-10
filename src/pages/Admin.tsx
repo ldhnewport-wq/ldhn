@@ -685,6 +685,7 @@ const ArticlesTab = () => {
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("news");
   const [imageUrl, setImageUrl] = useState("");
+  const [images, setImages] = useState<string[]>([]);
   const [videoUrl, setVideoUrl] = useState("");
   const [published, setPublished] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -700,25 +701,50 @@ const ArticlesTab = () => {
 
   const resetForm = () => {
     setEditId(null); setTitle(""); setContent(""); setCategory("news");
-    setImageUrl(""); setVideoUrl(""); setPublished(true);
+    setImageUrl(""); setImages([]); setVideoUrl(""); setPublished(true);
+  };
+
+  const uploadOne = async (file: File): Promise<string | null> => {
+    const ext = (file.name.split(".").pop() || "").toLowerCase();
+    if (["heic", "heif"].includes(ext)) {
+      toast({ title: "Format non supporté", description: "Les fichiers HEIC ne s'affichent pas dans le navigateur. Convertissez en JPG ou PNG.", variant: "destructive" });
+      return null;
+    }
+    const path = `articles/${Date.now()}-${Math.random().toString(36).slice(2,7)}.${ext}`;
+    const { error } = await supabase.storage.from("media").upload(path, file);
+    if (error) { toast({ title: "Erreur upload", description: error.message, variant: "destructive" }); return null; }
+    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+    return urlData.publicUrl;
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const ext = file.name.split(".").pop();
-    const path = `articles/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("media").upload(path, file);
-    if (error) { toast({ title: "Erreur upload", variant: "destructive" }); setUploading(false); return; }
-    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
-    setImageUrl(urlData.publicUrl);
+    const url = await uploadOne(file);
+    if (url) setImageUrl(url);
     setUploading(false);
+    e.target.value = "";
   };
+
+  const handleMultiUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setUploading(true);
+    const urls: string[] = [];
+    for (const f of files) {
+      const u = await uploadOne(f);
+      if (u) urls.push(u);
+    }
+    if (urls.length) setImages((prev) => [...prev, ...urls]);
+    setUploading(false);
+    e.target.value = "";
+  };
+
 
   const save = useMutation({
     mutationFn: async () => {
-      const payload = { title, content, category, image_url: imageUrl || null, video_url: videoUrl || null, published };
+      const payload = { title, content, category, image_url: imageUrl || null, images, video_url: videoUrl || null, published };
       if (editId) {
         const { error } = await supabase.from("articles").update(payload).eq("id", editId);
         if (error) throw error;
@@ -763,7 +789,7 @@ const ArticlesTab = () => {
             </div>
             <div><Label>Contenu</Label><Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={5} /></div>
             <div>
-              <Label>Image</Label>
+              <Label>Image principale (couverture)</Label>
               <div className="flex gap-2 items-center">
                 <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="URL ou upload" className="flex-1" />
                 <Label htmlFor="img-upload" className="cursor-pointer">
@@ -771,9 +797,36 @@ const ArticlesTab = () => {
                     <Upload className="h-4 w-4" /> {uploading ? "..." : "Upload"}
                   </div>
                 </Label>
-                <input id="img-upload" type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+                <input id="img-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handleUpload} />
               </div>
               {imageUrl && <img src={imageUrl} alt="preview" className="mt-2 h-32 object-cover rounded-lg" />}
+              <p className="text-xs text-muted-foreground mt-1">Formats supportés: JPG, PNG, WebP, GIF. Le HEIC ne s'affiche pas dans les navigateurs.</p>
+            </div>
+            <div>
+              <Label>Photos additionnelles ({images.length})</Label>
+              <Label htmlFor="imgs-upload" className="cursor-pointer block mt-1">
+                <div className="inline-flex items-center gap-1 px-3 py-2 rounded-md bg-secondary text-secondary-foreground text-sm hover:bg-secondary/80">
+                  <Upload className="h-4 w-4" /> Ajouter une ou plusieurs photos
+                </div>
+              </Label>
+              <input id="imgs-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className="hidden" onChange={handleMultiUpload} />
+              {images.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {images.map((url, idx) => (
+                    <div key={idx} className="relative group">
+                      <img src={url} alt="" className="h-20 w-full object-cover rounded" />
+                      <button
+                        type="button"
+                        onClick={() => setImages((prev) => prev.filter((_, i) => i !== idx))}
+                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-90 hover:opacity-100"
+                        aria-label="Retirer"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div><Label>URL vidéo (YouTube embed)</Label><Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/embed/..." /></div>
             <div className="flex items-center gap-2">
@@ -799,11 +852,12 @@ const ArticlesTab = () => {
                 </div>
                 <span className="text-xs text-muted-foreground">
                   {CATEGORIES.find((c) => c.value === a.category)?.label} · {new Date(a.created_at).toLocaleDateString("fr-CA")}
+                  {a.images?.length ? ` · ${a.images.length} photo(s)` : ""}
                 </span>
               </div>
               <Button variant="ghost" size="icon" onClick={() => {
                 setEditId(a.id); setTitle(a.title); setContent(a.content || "");
-                setCategory(a.category); setImageUrl(a.image_url || "");
+                setCategory(a.category); setImageUrl(a.image_url || ""); setImages(a.images ?? []);
                 setVideoUrl(a.video_url || ""); setPublished(a.published); setOpen(true);
               }}><Pencil className="h-4 w-4" /></Button>
               <Button variant="ghost" size="icon" onClick={() => del.mutate(a.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
@@ -814,6 +868,7 @@ const ArticlesTab = () => {
     </div>
   );
 };
+
 
 // ─── Login Form ──────────────────────────────────────────────
 const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {

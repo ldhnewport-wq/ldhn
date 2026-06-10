@@ -101,7 +101,22 @@ const Reportage = () => {
                     src={article.image_url}
                     alt={article.title}
                     className="w-full max-h-[600px] object-contain bg-muted"
+                    loading="lazy"
                   />
+                )}
+                {article.images && article.images.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-1 bg-muted">
+                    {article.images.map((src, idx) => (
+                      <a key={idx} href={src} target="_blank" rel="noreferrer" className="block">
+                        <img
+                          src={src}
+                          alt={`${article.title} - photo ${idx + 1}`}
+                          className="w-full h-40 md:h-48 object-cover hover:opacity-90 transition"
+                          loading="lazy"
+                        />
+                      </a>
+                    ))}
+                  </div>
                 )}
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-3">
