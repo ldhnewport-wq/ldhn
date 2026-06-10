@@ -744,7 +744,7 @@ const ArticlesTab = () => {
 
   const save = useMutation({
     mutationFn: async () => {
-      const payload = { title, content, category, image_url: imageUrl || null, video_url: videoUrl || null, published };
+      const payload = { title, content, category, image_url: imageUrl || null, images, video_url: videoUrl || null, published };
       if (editId) {
         const { error } = await supabase.from("articles").update(payload).eq("id", editId);
         if (error) throw error;
@@ -789,7 +789,7 @@ const ArticlesTab = () => {
             </div>
             <div><Label>Contenu</Label><Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={5} /></div>
             <div>
-              <Label>Image</Label>
+              <Label>Image principale (couverture)</Label>
               <div className="flex gap-2 items-center">
                 <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="URL ou upload" className="flex-1" />
                 <Label htmlFor="img-upload" className="cursor-pointer">
@@ -797,9 +797,36 @@ const ArticlesTab = () => {
                     <Upload className="h-4 w-4" /> {uploading ? "..." : "Upload"}
                   </div>
                 </Label>
-                <input id="img-upload" type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+                <input id="img-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handleUpload} />
               </div>
               {imageUrl && <img src={imageUrl} alt="preview" className="mt-2 h-32 object-cover rounded-lg" />}
+              <p className="text-xs text-muted-foreground mt-1">Formats supportés: JPG, PNG, WebP, GIF. Le HEIC ne s'affiche pas dans les navigateurs.</p>
+            </div>
+            <div>
+              <Label>Photos additionnelles ({images.length})</Label>
+              <Label htmlFor="imgs-upload" className="cursor-pointer block mt-1">
+                <div className="inline-flex items-center gap-1 px-3 py-2 rounded-md bg-secondary text-secondary-foreground text-sm hover:bg-secondary/80">
+                  <Upload className="h-4 w-4" /> Ajouter une ou plusieurs photos
+                </div>
+              </Label>
+              <input id="imgs-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className="hidden" onChange={handleMultiUpload} />
+              {images.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {images.map((url, idx) => (
+                    <div key={idx} className="relative group">
+                      <img src={url} alt="" className="h-20 w-full object-cover rounded" />
+                      <button
+                        type="button"
+                        onClick={() => setImages((prev) => prev.filter((_, i) => i !== idx))}
+                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-90 hover:opacity-100"
+                        aria-label="Retirer"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div><Label>URL vidéo (YouTube embed)</Label><Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/embed/..." /></div>
             <div className="flex items-center gap-2">
@@ -825,11 +852,12 @@ const ArticlesTab = () => {
                 </div>
                 <span className="text-xs text-muted-foreground">
                   {CATEGORIES.find((c) => c.value === a.category)?.label} · {new Date(a.created_at).toLocaleDateString("fr-CA")}
+                  {a.images?.length ? ` · ${a.images.length} photo(s)` : ""}
                 </span>
               </div>
               <Button variant="ghost" size="icon" onClick={() => {
                 setEditId(a.id); setTitle(a.title); setContent(a.content || "");
-                setCategory(a.category); setImageUrl(a.image_url || "");
+                setCategory(a.category); setImageUrl(a.image_url || ""); setImages(a.images ?? []);
                 setVideoUrl(a.video_url || ""); setPublished(a.published); setOpen(true);
               }}><Pencil className="h-4 w-4" /></Button>
               <Button variant="ghost" size="icon" onClick={() => del.mutate(a.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
@@ -840,6 +868,7 @@ const ArticlesTab = () => {
     </div>
   );
 };
+
 
 // ─── Login Form ──────────────────────────────────────────────
 const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
