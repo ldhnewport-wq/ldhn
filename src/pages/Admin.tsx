@@ -685,6 +685,7 @@ const ArticlesTab = () => {
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("news");
   const [imageUrl, setImageUrl] = useState("");
+  const [images, setImages] = useState<string[]>([]);
   const [videoUrl, setVideoUrl] = useState("");
   const [published, setPublished] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -700,21 +701,46 @@ const ArticlesTab = () => {
 
   const resetForm = () => {
     setEditId(null); setTitle(""); setContent(""); setCategory("news");
-    setImageUrl(""); setVideoUrl(""); setPublished(true);
+    setImageUrl(""); setImages([]); setVideoUrl(""); setPublished(true);
+  };
+
+  const uploadOne = async (file: File): Promise<string | null> => {
+    const ext = (file.name.split(".").pop() || "").toLowerCase();
+    if (["heic", "heif"].includes(ext)) {
+      toast({ title: "Format non supporté", description: "Les fichiers HEIC ne s'affichent pas dans le navigateur. Convertissez en JPG ou PNG.", variant: "destructive" });
+      return null;
+    }
+    const path = `articles/${Date.now()}-${Math.random().toString(36).slice(2,7)}.${ext}`;
+    const { error } = await supabase.storage.from("media").upload(path, file);
+    if (error) { toast({ title: "Erreur upload", description: error.message, variant: "destructive" }); return null; }
+    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+    return urlData.publicUrl;
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const ext = file.name.split(".").pop();
-    const path = `articles/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("media").upload(path, file);
-    if (error) { toast({ title: "Erreur upload", variant: "destructive" }); setUploading(false); return; }
-    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
-    setImageUrl(urlData.publicUrl);
+    const url = await uploadOne(file);
+    if (url) setImageUrl(url);
     setUploading(false);
+    e.target.value = "";
   };
+
+  const handleMultiUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setUploading(true);
+    const urls: string[] = [];
+    for (const f of files) {
+      const u = await uploadOne(f);
+      if (u) urls.push(u);
+    }
+    if (urls.length) setImages((prev) => [...prev, ...urls]);
+    setUploading(false);
+    e.target.value = "";
+  };
+
 
   const save = useMutation({
     mutationFn: async () => {
