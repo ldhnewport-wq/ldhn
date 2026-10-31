@@ -17,6 +17,8 @@ import TournoiHoraire from "./pages/TournoiHoraire.tsx";
 import TournoiTableau from "./pages/TournoiTableau.tsx";
 import TournoiContent from "./pages/TournoiContent.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Archives from "./pages/Archives.tsx";
+import ArchiveSeason from "./pages/ArchiveSeason.tsx";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,8 @@ const App = () => (
           <Route path="/tournoi/reglements" element={<TournoiContent section="reglements" />} />
           <Route path="/tournoi/remerciements" element={<TournoiContent section="remerciements" />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/archives" element={<Archives />} />
+          <Route path="/archives/:seasonKey" element={<ArchiveSeason />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
