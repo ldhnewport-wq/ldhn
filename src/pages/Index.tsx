@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import ldhnLogo from "@/assets/logo-new.png";
+import bulldogsImage from "@/assets/bulldogs-2026-27.jpg.asset.json";
+import { Button } from "@/components/ui/button";
 import { Users, Swords, Trophy, Monitor, Settings, Newspaper, Sparkles, Archive } from "lucide-react";
 
 const navItems = [
@@ -51,6 +53,12 @@ const Index = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+          <Button variant="outline" asChild className="h-auto flex-col gap-3 p-6 bg-card rounded-xl">
+            <Link to="/bulldogs-2026-27">
+              <img src={bulldogsImage.url} alt="Bulldogs Le Rocher" className="w-24 h-24 object-contain" />
+              <span className="font-display text-lg font-bold uppercase">Bulldogs 2026-27</span>
+            </Link>
+          </Button>
           {navItems.map((item, i) => (
             <motion.div
               key={item.to}

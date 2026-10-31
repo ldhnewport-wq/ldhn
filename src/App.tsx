@@ -19,6 +19,7 @@ import TournoiContent from "./pages/TournoiContent.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Archives from "./pages/Archives.tsx";
 import ArchiveSeason from "./pages/ArchiveSeason.tsx";
+import Bulldogs from "./pages/Bulldogs.tsx";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/archives" element={<Archives />} />
           <Route path="/archives/:seasonKey" element={<ArchiveSeason />} />
+          <Route path="/bulldogs-2026-27" element={<Bulldogs />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
