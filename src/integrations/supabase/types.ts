@@ -367,6 +367,27 @@ export type Database = {
           },
         ]
       }
+      season_archives: {
+        Row: {
+          archived_at: string
+          data: Json
+          label: string
+          season_key: string
+        }
+        Insert: {
+          archived_at?: string
+          data?: Json
+          label: string
+          season_key: string
+        }
+        Update: {
+          archived_at?: string
+          data?: Json
+          label?: string
+          season_key?: string
+        }
+        Relationships: []
+      }
       teams: {
         Row: {
           abbr: string
