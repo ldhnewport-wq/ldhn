@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import ldhnLogo from "@/assets/logo-new.png";
-import { Users, Swords, Trophy, Monitor, Settings, Newspaper, Sparkles } from "lucide-react";
+import { Users, Swords, Trophy, Monitor, Settings, Newspaper, Sparkles, Archive } from "lucide-react";
 
 const navItems = [
   { to: "/equipes", icon: Users, label: "Équipes", desc: "Voir les équipes et alignements" },
@@ -9,6 +9,7 @@ const navItems = [
   { to: "/classement", icon: Trophy, label: "Classement", desc: "Voir le classement en temps réel" },
   { to: "/reportage", icon: Newspaper, label: "Reportage", desc: "Photos, vidéos et nouvelles de la ligue" },
   { to: "/arena", icon: Monitor, label: "Mode Aréna", desc: "Affichage plein écran pour projection" },
+  { to: "/archives", icon: Archive, label: "Archives", desc: "" },
   { to: "/admin", icon: Settings, label: "Admin", desc: "Réservé aux administrateurs" },
 ];
 
