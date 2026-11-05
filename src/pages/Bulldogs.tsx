@@ -15,7 +15,7 @@ export default function Bulldogs() {
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-neon">Bulldogs 2026-27</h1>
         </header>
         <StatTracker />
-        <img src={bulldogsImage.url} alt="Bulldogs Le Rocher" className="block w-full max-w-xl h-auto mx-auto mt-12 object-contain" />
+        <img src={new URL(bulldogsImage.url, "https://ldhn.lovable.app").href} alt="Bulldogs Le Rocher" className="block w-full max-w-xl h-auto mx-auto mt-12 object-contain" />
       </div>
     </div>
   );

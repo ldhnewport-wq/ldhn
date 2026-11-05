@@ -55,7 +55,7 @@ const Index = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
           <Button variant="outline" asChild className="h-auto flex-col gap-3 p-6 bg-card rounded-xl">
             <Link to="/bulldogs-2026-27">
-              <img src={bulldogsImage.url} alt="Bulldogs Le Rocher" className="w-24 h-24 object-contain" />
+              <img src={new URL(bulldogsImage.url, "https://ldhn.lovable.app").href} alt="Bulldogs Le Rocher" className="w-24 h-24 object-contain" />
               <span className="font-display text-lg font-bold uppercase">Bulldogs 2026-27</span>
             </Link>
           </Button>
