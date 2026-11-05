@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, Undo2, Save, LogIn } from "lucide-react";
+import { Plus, Trash2, Undo2, Save } from "lucide-react";
+import { listBulldogsGames, listBulldogsEvents, saveBulldogsGame, addBulldogsEvent, removeBulldogsEvent } from "@/lib/bulldogsStorage";
 import { toast } from "sonner";
 import { actions, countEvents, faceoffStats, needsPlayer, positions, type ActionKind, type BulldogsPlayer, type Position } from "@/lib/bulldogsStats";
 import Rink from "./Rink";
@@ -18,8 +19,6 @@ export default function StatTracker() {
   const qc = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [gameId, setGameId] = useState("");
   const [opponent, setOpponent] = useState("");
   const [date, setDate] = useState(localDate);
@@ -40,10 +39,7 @@ export default function StatTracker() {
     const { data } = supabase.auth.onAuthStateChange((_, next) => { setSession(next); setAuthReady(true); });
     return () => data.subscription.unsubscribe();
   }, []);
-  const games = useQuery({ queryKey: ["bulldogs-games", session?.user.id], enabled: !!session, queryFn: async () => {
-    const { data, error } = await supabase.from("bulldogs_games").select("*").order("created_at", { ascending: false });
-    if (error) throw error; return data;
-  }});
+  const games = useQuery({ queryKey: ["bulldogs-games", session?.user.id ?? "device"], enabled: authReady, queryFn: () => listBulldogsGames(session?.user.id) });
   const selectedGame = games.data?.find(g => g.id === gameId);
   useEffect(() => {
     if (!selectedGame) return;
@@ -51,10 +47,7 @@ export default function StatTracker() {
     setRoster(Array.isArray(selectedGame.roster) ? selectedGame.roster as unknown as BulldogsPlayer[] : []);
     setDirty(false); setActive(null); setPlayerId(""); setCentreId("");
   }, [selectedGame]);
-  const eventQuery = useQuery({ queryKey: ["bulldogs-events", gameId], enabled: !!session && !!gameId, queryFn: async () => {
-    const { data, error } = await supabase.from("bulldogs_events").select("*").eq("game_id", gameId).order("created_at");
-    if (error) throw error; return data;
-  }});
+  const eventQuery = useQuery({ queryKey: ["bulldogs-events", gameId, session?.user.id ?? "device"], enabled: authReady && !!gameId, queryFn: () => listBulldogsEvents(session?.user.id, gameId) });
   const events = eventQuery.data ?? [];
   useEffect(() => {
     if (!session) return;
@@ -68,13 +61,11 @@ export default function StatTracker() {
     try { await work(); } catch (error) { toast.error(error instanceof Error ? error.message : "Sauvegarde impossible. Vérifiez votre connexion."); } finally { setBusy(false); }
   };
   const save = () => run(async () => {
-    if (!session) return;
     if (!opponent.trim()) { toast.error("Indiquez l’équipe adverse."); return; }
     if (roster.some(p => !p.name.trim())) { toast.error("Indiquez le nom de chaque joueur."); return; }
     const payload = { opponent: opponent.trim(), played_at: date, roster: roster as unknown as Json };
-    const result = gameId ? await supabase.from("bulldogs_games").update(payload).eq("id", gameId).select().single() : await supabase.from("bulldogs_games").insert({ ...payload, user_id: session.user.id }).select().single();
-    if (result.error) throw result.error;
-    setGameId(result.data.id); setDirty(false);
+    const result = await saveBulldogsGame(payload, gameId, session?.user.id);
+    setGameId(result.id); setDirty(false);
     await qc.invalidateQueries({ queryKey: ["bulldogs-games"] }); toast.success("Match et alignement enregistrés");
   });
   const record = (kind: ActionKind, point?: { x: number; y: number }, selectedId = playerId) => run(async () => {
@@ -83,24 +74,22 @@ export default function StatTracker() {
     if (needsPlayer(kind) && !player) { toast.error("Sélectionnez un joueur."); return; }
     if (kind.startsWith("faceoff") && player?.position !== "C") { toast.error("Sélectionnez un centre."); return; }
     if (actions[kind].location && !point) return;
-    const { error } = await supabase.from("bulldogs_events").insert({ game_id: gameId, kind, period, player_id: player?.id ?? null, player_name: player ? `#${player.number} ${player.name}` : null, x: point?.x ?? null, y: point?.y ?? null });
-    if (error) throw error;
-    await qc.invalidateQueries({ queryKey: ["bulldogs-events", gameId] });
+    await addBulldogsEvent({ game_id: gameId, kind, period, player_id: player?.id ?? null, player_name: player ? `#${player.number} ${player.name}` : null, x: point?.x ?? null, y: point?.y ?? null }, session?.user.id);
+    await qc.invalidateQueries({ queryKey: ["bulldogs-events"] });
     setActive(null);
   });
   const remove = (id: string) => run(async () => {
-    const { error } = await supabase.from("bulldogs_events").delete().eq("id", id);
-    if (error) throw error; await qc.invalidateQueries({ queryKey: ["bulldogs-events", gameId] });
+    await removeBulldogsEvent(id, session?.user.id);
+    await qc.invalidateQueries({ queryKey: ["bulldogs-events"] });
   });
   const updatePlayer = (id: string, update: Partial<BulldogsPlayer>) => { setRoster(current => current.map(p => p.id === id ? { ...p, ...update } : p)); setDirty(true); };
   const ready = !!gameId && !dirty && !busy && !eventQuery.isPending && !eventQuery.isError;
   if (!authReady) return <p className="text-muted-foreground">Chargement…</p>;
-  if (!session) return <section className="border-t border-border pt-6"><h2 className="font-display text-2xl mb-4">Prise de statistiques</h2><form className="max-w-sm space-y-4" onSubmit={e => { e.preventDefault(); run(async () => { const { error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; setPassword(""); }); }}><label className="block space-y-2"><span>Courriel</span><Input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="username" /></label><label className="block space-y-2"><span>Mot de passe</span><Input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" /></label><Button disabled={busy} type="submit"><LogIn />Se connecter</Button></form></section>;
   return <Tabs defaultValue="live">
     <TabsList className="mb-6"><TabsTrigger value="live">Prise de statistiques</TabsTrigger><TabsTrigger value="archives">Archives</TabsTrigger></TabsList>
-    <TabsContent value="archives"><MatchArchives games={games.data ?? []} userId={session.user.id} /></TabsContent>
+    <TabsContent value="archives">{games.isPending ? <p role="status">Chargement des matchs…</p> : games.isError ? <Button variant="outline" onClick={() => games.refetch()}>Réessayer le chargement des matchs</Button> : <MatchArchives games={games.data ?? []} userId={session?.user.id} />}</TabsContent>
     <TabsContent value="live" forceMount className="data-[state=inactive]:hidden"><section className="space-y-7">
-    <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="font-display text-2xl">Prise de statistiques</h2><div className="flex gap-2"><Button variant="outline" disabled={busy} onClick={() => { if (dirty && !window.confirm("Quitter sans enregistrer les changements ?")) return; setGameId(""); setOpponent(""); setDate(localDate()); setRoster(roster.map(p => ({ ...p }))); setDirty(true); setActive(null); }}><Plus />Nouveau match</Button><Button variant="ghost" onClick={() => supabase.auth.signOut()}>Déconnexion</Button></div></div>
+    <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="font-display text-2xl">Prise de statistiques</h2><div className="flex gap-2"><Button variant="outline" disabled={busy} onClick={() => { if (dirty && !window.confirm("Quitter sans enregistrer les changements ?")) return; setGameId(""); setOpponent(""); setDate(localDate()); setRoster(roster.map(p => ({ ...p }))); setDirty(true); setActive(null); }}><Plus />Nouveau match</Button>{session && <Button variant="ghost" onClick={() => supabase.auth.signOut()}>Déconnexion</Button>}</div></div>
     {(games.isError || eventQuery.isError) && <p role="alert" className="text-destructive">Impossible de charger les statistiques. <Button variant="link" onClick={() => { games.refetch(); eventQuery.refetch(); }}>Réessayer</Button></p>}
     <div className="grid gap-4 sm:grid-cols-3"><label className="space-y-2"><span>Match enregistré</span><select className="bulldogs-select" value={gameId} disabled={busy} onChange={e => { if (dirty && !window.confirm("Quitter sans enregistrer les changements ?")) return; setGameId(e.target.value); }}><option value="">Nouveau match</option>{games.data?.map(g => <option key={g.id} value={g.id}>{g.played_at} · {g.opponent}</option>)}</select></label><label className="space-y-2"><span>Adversaire</span><Input value={opponent} onChange={e => { setOpponent(e.target.value); setDirty(true); }} placeholder="Équipe adverse" /></label><label className="space-y-2"><span>Date du match</span><Input type="date" value={date} onChange={e => { setDate(e.target.value); setDirty(true); }} /></label></div>
     <details className="border-y border-border py-4" open={!gameId || dirty}><summary className="cursor-pointer font-display text-xl">Alignement · {roster.length} joueurs</summary><div className="mt-4 space-y-3">{roster.map(p => <div key={p.id} className="grid grid-cols-[60px_1fr_40px] sm:grid-cols-[70px_1fr_190px_40px] gap-2"><Input aria-label="Numéro du joueur" value={p.number} onChange={e => updatePlayer(p.id, { number: e.target.value })} placeholder="#" /><Input aria-label="Nom du joueur" value={p.name} onChange={e => updatePlayer(p.id, { name: e.target.value })} placeholder="Nom du joueur" /><select aria-label="Position du joueur" className="bulldogs-select col-span-2 sm:col-span-1 row-start-2 sm:row-start-auto" value={p.position} onChange={e => updatePlayer(p.id, { position: e.target.value as Position })}>{positions.map(pos => <option key={pos} value={pos}>{positionLabels[pos]}</option>)}</select><Button variant="ghost" size="icon" aria-label={`Retirer ${p.name || "le joueur"}`} onClick={() => { setRoster(roster.filter(row => row.id !== p.id)); setDirty(true); }}><Trash2 /></Button></div>)}<Button variant="outline" onClick={() => { setRoster([...roster, { id: crypto.randomUUID(), name: "", number: "", position: "C" }]); setDirty(true); }}><Plus />Ajouter un joueur</Button></div></details>

@@ -1,21 +1,17 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { listBulldogsEvents } from "@/lib/bulldogsStorage";
 import type { Tables } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { actions, countEvents, faceoffStats, type ActionKind, type BulldogsPlayer } from "@/lib/bulldogsStats";
 import Rink from "./Rink";
 
-export default function MatchArchives({ games, userId }: { games: Tables<"bulldogs_games">[]; userId: string }) {
+export default function MatchArchives({ games, userId }: { games: Tables<"bulldogs_games">[]; userId?: string }) {
   const [selectedId, setSelectedId] = useState("");
   const [period, setPeriod] = useState("all");
   const game = games.find(g => g.id === selectedId);
-  const query = useQuery({ queryKey: ["bulldogs-events", "archives", userId], queryFn: async () => {
-    const { data, error } = await supabase.from("bulldogs_events").select("*").order("created_at");
-    if (error) throw error;
-    return data;
-  }});
+  const query = useQuery({ queryKey: ["bulldogs-events", "archives", userId ?? "device"], queryFn: () => listBulldogsEvents(userId) });
   if (query.isPending) return <p role="status" className="py-8 text-muted-foreground">Chargement des archives…</p>;
   if (query.isError) return <div role="alert" className="py-8"><p>Impossible de charger les statistiques.</p><Button variant="outline" onClick={() => query.refetch()}>Réessayer</Button></div>;
   const allEvents = query.data;

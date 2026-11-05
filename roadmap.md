@@ -1,5 +1,6 @@
 # Archives
-- [ ] Add a read-only Bulldogs Archives tab with per-match statistics and rink locations; verify saved data.
+- [x] Open Bulldogs without login using device-local saved games while preserving protected cloud games for signed-in accounts.
+- [x] Add a read-only Bulldogs Archives tab with per-match statistics and rink locations; verify saved data.
 - [x] Add Bulldogs positional lineup, live event counters, faceoffs, penalties, blocked shots and rink map.
 - [x] Verify Bulldogs tracking and saved match recovery.
 - [x] Preserve the existing 2025-26 season and 2026 tournament data in a read-only snapshot.

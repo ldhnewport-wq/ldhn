@@ -4,3 +4,4 @@
 - Bulldogs games and action events are separate owner-scoped records with Realtime invalidation, so tracking cannot modify league or archive data.
 - Bulldogs rink coordinates use percentages and statistics derive from the event journal, so corrections and screen resizing preserve totals and locations.
 - Bulldogs match archives are read-only views of owner-scoped saved games and their event journal; they reuse live statistic calculations and do not alter season snapshots.
+- Bulldogs storage uses device-local records when signed out and protected owner-scoped cloud records when signed in, so direct access does not require anonymous signup or expose existing accounts.
