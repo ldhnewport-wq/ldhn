@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@300;400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -44,6 +43,9 @@
     --arena-gold: 45 100% 55%;
     --arena-red: 0 85% 55%;
     --arena-blue: 210 100% 55%;
+    --rink-ice: 0 0% 98%;
+    --rink-edge: 220 8% 65%;
+    --rink-blocked: 0 0% 0%;
 
     --sidebar-background: 220 18% 8%;
     --sidebar-foreground: 0 0% 90%;
@@ -55,6 +57,20 @@
     --sidebar-ring: 145 100% 42%;
   }
 }
+
+.bulldogs-select { width: 100%; min-width: 0; height: 40px; border: 1px solid hsl(var(--input)); border-radius: 6px; padding: 0 10px; background: hsl(var(--background)); color: hsl(var(--foreground)); }
+.bulldogs-select:focus-visible { outline: 2px solid hsl(var(--ring)); }
+.bulldogs-rink { aspect-ratio: 2 / 1; }
+.rink-ice { fill: hsl(var(--rink-ice)); stroke: hsl(var(--rink-edge)); stroke-width: 6; }
+.rink-red-line { fill: none; stroke: hsl(var(--destructive)); stroke-width: 3; }
+.rink-blue-line { fill: none; stroke: hsl(var(--arena-blue)); stroke-width: 4; }
+.rink-red-dot { fill: hsl(var(--destructive)); }
+.rink-blue-dot { fill: hsl(var(--arena-blue)); }
+.marker-for { color: hsl(var(--primary)); stroke: hsl(var(--primary)); }
+.marker-against { color: hsl(var(--destructive)); stroke: hsl(var(--destructive)); }
+.marker-blocked { color: hsl(var(--rink-blocked)); stroke: hsl(var(--rink-blocked)); }
+.rink-marker { fill: none; stroke-width: 6; pointer-events: none; }
+.marker-key { background: hsl(var(--rink-ice)); width: 26px; height: 26px; border-radius: 4px; font-size: 25px; line-height: 24px; text-align: center; font-weight: 700; }
 
 @layer base {
   * {

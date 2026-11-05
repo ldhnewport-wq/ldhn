@@ -113,6 +113,77 @@ export type Database = {
         }
         Relationships: []
       }
+      bulldogs_events: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          kind: string
+          period: string
+          player_id: string | null
+          player_name: string | null
+          x: number | null
+          y: number | null
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          kind: string
+          period?: string
+          player_id?: string | null
+          player_name?: string | null
+          x?: number | null
+          y?: number | null
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          kind?: string
+          period?: string
+          player_id?: string | null
+          player_name?: string | null
+          x?: number | null
+          y?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulldogs_events_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "bulldogs_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bulldogs_games: {
+        Row: {
+          created_at: string
+          id: string
+          opponent: string
+          played_at: string
+          roster: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          opponent?: string
+          played_at?: string
+          roster?: Json
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          opponent?: string
+          played_at?: string
+          roster?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       lineup_approvals: {
         Row: {
           away_coach_initials: string | null
